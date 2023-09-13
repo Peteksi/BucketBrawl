@@ -6,16 +6,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(NetworkRunner))]
 public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
     [SerializeField] private NetworkPrefabRef _playerPrefab;
 
     NetworkRunner _runner;
-    Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new Dictionary<PlayerRef, NetworkObject>();
+    Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new();
+
 
     async void StartGame(GameMode gameMode)
     {
-        _runner = gameObject.AddComponent<NetworkRunner>();
+        _runner = gameObject.GetComponent<NetworkRunner>();
         _runner.ProvideInput = true;
 
         await _runner.StartGame(new StartGameArgs()
@@ -93,21 +95,4 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadDone(NetworkRunner runner) { }
     public void OnSceneLoadStart(NetworkRunner runner) { }
-
-
-    private void OnGUI()
-    {
-        if (_runner == null)
-        {
-            if (GUI.Button(new Rect(0, 0, 200, 40), "Host"))
-            {
-                StartGame(GameMode.Host);
-            }
-
-            if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
-            {
-                StartGame(GameMode.Client);
-            }
-        }
-    }
 }
