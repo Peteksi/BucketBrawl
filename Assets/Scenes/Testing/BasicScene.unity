@@ -251,6 +251,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerPrefab:
     RawGuidValue: b6e78a786f3359b4dbd9bc5ed68874a5
+  _localClientInput: {fileID: 11400000, guid: 9f093314574ec3549bb2e252dc3c23de, type: 2}
 --- !u!1 &1037162258
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,9 +7,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(NetworkRunner))]
-public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
+public class BasicRunner : MonoBehaviour, INetworkRunnerCallbacks
 {
     [SerializeField] private NetworkPrefabRef _playerPrefab;
+    [SerializeField] private LocalClientInput _localClientInput;
 
     NetworkRunner _runner;
     Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new();
@@ -42,6 +43,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
         if (_spawnedPlayers.TryGetValue(player, out NetworkObject networkPlayerObject))
@@ -54,19 +56,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        var data = new NetworkInputData();
-
-        if (Input.GetKey(KeyCode.W))
-            data.direction += Vector2.up;
-
-        if (Input.GetKey(KeyCode.A))
-            data.direction += Vector2.left;
-
-        if (Input.GetKey(KeyCode.S))
-            data.direction += Vector2.down;
-
-        if (Input.GetKey(KeyCode.D))
-            data.direction += Vector2.right;
+        var data = _localClientInput.LocalPlayerOneInput;
 
         input.Set(data);
     }
