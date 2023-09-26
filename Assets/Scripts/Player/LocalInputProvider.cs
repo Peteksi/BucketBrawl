@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(PlayerInput))]
 public class LocalInputProvider : MonoBehaviour
 {
     [SerializeField] LocalClientInput clientInput;
@@ -12,6 +13,8 @@ public class LocalInputProvider : MonoBehaviour
 
     private void Start()
     {
+        DontDestroyOnLoad(this.gameObject);
+
         playerInput = GetComponent<PlayerInput>();
     }
 
