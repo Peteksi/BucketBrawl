@@ -15,14 +15,14 @@ public struct NetworkInputData : INetworkInput
     {
         get
         {
-            switch (i)
+            return i switch
             {
-                case 0: return playerA;
-                case 1: return playerB;
-                case 2: return playerC;
-                case 3: return playerD;
-                default: return default;
-            }
+                0 => playerA,
+                1 => playerB,
+                2 => playerC,
+                3 => playerD,
+                _ => default,
+            };
         }
 
         set

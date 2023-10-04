@@ -249,8 +249,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5161ee7f0ac9798439bbe86be40b7295, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerPrefab:
-    RawGuidValue: b6e78a786f3359b4dbd9bc5ed68874a5
+  _clientPrefab:
+    RawGuidValue: 49f3e15f7c717ef4bbeba2dc4fddcae8
   _localClientInput: {fileID: 11400000, guid: 9f093314574ec3549bb2e252dc3c23de, type: 2}
 --- !u!1 &1037162258
 GameObject:
@@ -351,7 +351,7 @@ Transform:
   m_GameObject: {fileID: 1037162258}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.96, z: 0}
+  m_LocalPosition: {x: 0, y: -2.4, z: 0}
   m_LocalScale: {x: 19.837927, y: 1, z: 15.463375}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -669,10 +669,10 @@ MonoBehaviour:
   m_JoinAction:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Join
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: 
+      m_Id: 22b9413d-648a-4ba4-b9e6-e88cd31f7a9c
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -695,7 +695,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 1837333078}
   - {fileID: 1666655682}
-  - {fileID: 559224665}
   - {fileID: 1037162262}
+  - {fileID: 559224665}
   - {fileID: 240439063}
   - {fileID: 1971303768}

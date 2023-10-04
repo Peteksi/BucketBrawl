@@ -9,11 +9,11 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(NetworkRunner))]
 public class BasicRunner : MonoBehaviour, INetworkRunnerCallbacks
 {
-    [SerializeField] private NetworkPrefabRef _playerPrefab;
+    [SerializeField] private NetworkPrefabRef _clientPrefab;
     [SerializeField] private LocalClientInput _localClientInput;
 
     NetworkRunner _runner;
-    Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new();
+    Dictionary<PlayerRef, NetworkObject> _spawnedClients = new();
 
 
     async void StartGame(GameMode gameMode)
@@ -35,28 +35,26 @@ public class BasicRunner : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (runner.IsServer)
         {
-            // Create a unique position for the player
-            var spawnPosition = new Vector3(player.RawEncoded % runner.Config.Simulation.DefaultPlayers * 3, 1, 0);
-            var networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+            var networkClientObject = runner.Spawn(_clientPrefab, Vector3.zero, Quaternion.identity, player);
 
-            _spawnedPlayers.Add(player, networkPlayerObject);
+            _spawnedClients.Add(player, networkClientObject);
         }
     }
 
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        if (_spawnedPlayers.TryGetValue(player, out NetworkObject networkPlayerObject))
+        if (_spawnedClients.TryGetValue(player, out NetworkObject networkPlayerObject))
         {
             runner.Despawn(networkPlayerObject);
-            _spawnedPlayers.Remove(player);
+            _spawnedClients.Remove(player);
         }
     }
 
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        var data = _localClientInput.LocalPlayerOneInput;
+        var data = _localClientInput.ClientInput;
 
         input.Set(data);
     }
@@ -83,6 +81,6 @@ public class BasicRunner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
 
 
-    public void OnSceneLoadDone(NetworkRunner runner) { }
     public void OnSceneLoadStart(NetworkRunner runner) { }
+    public void OnSceneLoadDone(NetworkRunner runner) { }
 }
