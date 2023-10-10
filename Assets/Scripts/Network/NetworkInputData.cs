@@ -4,6 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
+enum NetworkInputButtons
+{
+    Action = 0,
+}
+
 public struct NetworkInputData : INetworkInput
 {
     private NetworkInputPlayer playerA;
@@ -40,7 +46,9 @@ public struct NetworkInputData : INetworkInput
 }
 
 
+
 public struct NetworkInputPlayer : INetworkStruct
 {
     public Vector2 Direction;
+    public NetworkButtons Buttons;
 }
