@@ -21,19 +21,15 @@ public class LocalClientInput : ScriptableObject
     public void SetLocalInput(PlayerInput playerInput)
     {
         var networkInput = ClientInput;
+        var networkPlayer = new NetworkInputPlayer();
+
         var direction = playerInput.actions.FindAction("Move").ReadValue<Vector2>();
-        var action = playerInput.actions.FindAction("Action");
+        var actionPressed = playerInput.actions.FindAction("Action").IsPressed();
 
-        bool actionPressed = action.IsPressed();
+        networkPlayer.Direction = direction;
+        if (actionPressed) networkPlayer.Buttons.Set(NetworkInputButtons.Action, true);
 
-        networkInput[playerInput.playerIndex] = new NetworkInputPlayer()
-        {
-            Direction = direction,
-            Buttons = { Action = (NetworkBool)actionPressed }
-        };
-
-        networkInput[playerInput.playerIndex]
-
+        networkInput[playerInput.playerIndex] = networkPlayer;
         ClientInput = networkInput;
     }
 }

@@ -17,6 +17,8 @@ public class ItemSpawner : SimulationBehaviour
 
     public void Spawn(Vector3? direction = null, float speed = 0)
     {
+        if (!Runner.IsServer) return;
+
         if (direction == null) direction = transform.forward;
 
         Runner.Spawn(

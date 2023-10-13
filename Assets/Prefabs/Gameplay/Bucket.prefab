@@ -58,6 +58,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 8628787224001434275}
+  - {fileID: -5079498200255784680}
   SimulationBehaviours: []
 --- !u!114 &8628787224001434275
 MonoBehaviour:
@@ -99,6 +100,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df1dbe215d76f95478ae16f7cc52b4df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _Velocity: {x: 0, y: 0, z: 0}
+  YMotionCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.0027313232
+      value: 0.94296265
+      inSlope: 1.486089
+      outSlope: 1.486089
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.09765625
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -4.0458164
+      outSlope: -4.0458164
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.04076929
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &4026544784137376221
 GameObject:
   m_ObjectHideFlags: 0

@@ -9,10 +9,10 @@ public class Player : NetworkBehaviour
 {
     [SerializeField] private int playerIndex;
 
+    [Networked] public NetworkButtons PreviousButtons { get; set; }
+
     private CustomCharacterController characterController;
     private ItemSpawner itemSpawner;
-
-    [Networked] public NetworkButtons PreviousButtons { get; set; }
 
 
     private void Awake()
@@ -28,7 +28,9 @@ public class Player : NetworkBehaviour
         {
             var inputData = combinedInputData[playerIndex];
 
-            //var pressedButtons = inputData.
+            var pressedButtons = inputData.Buttons.GetPressed(PreviousButtons);
+
+            PreviousButtons = inputData.Buttons;
 
             // movement
 
@@ -40,10 +42,10 @@ public class Player : NetworkBehaviour
 
             // throwing buckets
 
-            if (inputData.Buttons.IsSet(NetworkInputButtons.Action))
+            if (pressedButtons.IsSet(NetworkInputButtons.Action))
             {
-                itemSpawner.Spawn();
-            }
+                itemSpawner.Spawn(transform.forward, 12f);
+            } 
         }
     }
 }
