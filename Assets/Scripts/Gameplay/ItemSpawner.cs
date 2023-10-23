@@ -15,7 +15,7 @@ public class ItemSpawner : SimulationBehaviour
     }
 
 
-    public void Spawn(Vector3? direction = null, float speed = 0)
+    public void Spawn(Vector3? direction = null, float speed = 0, float flyTime = 0)
     {
         if (!Runner.IsServer) return;
 
@@ -28,7 +28,7 @@ public class ItemSpawner : SimulationBehaviour
             Object.InputAuthority,
             (runner, o) =>
             {
-                o.GetComponent<ItemBase>().Initialize((Vector3)direction, speed);
+                o.GetComponent<ItemBase>().Initialize((Vector3)direction, speed, flyTime);
             }
         );
     }

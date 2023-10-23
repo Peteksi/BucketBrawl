@@ -7,10 +7,12 @@ public class Bucket : ItemBase
 {
     [HideInInspector] [Networked] public Vector3 Velocity { get; set; }
 
+    [HideInInspector] [Networked] public CustomTickTimer FlyTimer { get; set; }
+
     public AnimationCurve YMotionCurve;
 
 
-    public override void Initialize(Vector3 direction, float speed)
+    public override void Initialize(Vector3 direction, float speed, float flyTime)
     {
         Velocity = direction * speed;
     }
@@ -27,6 +29,8 @@ public class Bucket : ItemBase
         {
             Velocity = Vector3.Reflect(Velocity, hitInfo.normal);
         }
+
+        transform.position = new(transform.position.x, FlyTimer.NormalizedValue(Runner), transform.position.z);
     }
 }
 

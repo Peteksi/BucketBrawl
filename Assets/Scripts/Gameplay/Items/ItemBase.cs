@@ -5,5 +5,5 @@ using UnityEngine;
 
 public abstract class ItemBase : NetworkBehaviour
 {
-    public abstract void Initialize(Vector3 direction, float speed);
+    public abstract void Initialize(Vector3 direction, float speed, float flyTime);
 }
