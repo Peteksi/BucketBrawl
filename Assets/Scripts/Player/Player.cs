@@ -44,7 +44,7 @@ public class Player : NetworkBehaviour
 
             if (pressedButtons.IsSet(NetworkInputButtons.Action))
             {
-                itemSpawner.Spawn(transform.forward, 12f);
+                itemSpawner.Spawn(transform.forward, 20, .75f);
             } 
         }
     }

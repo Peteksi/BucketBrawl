@@ -102,26 +102,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _Velocity: {x: 0, y: 0, z: 0}
+  _StartPositionY: 0
   YMotionCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.0027313232
-      value: 0.94296265
-      inSlope: 0.6570257
-      outSlope: 0.6570257
+      time: 0
+      value: 0
+      inSlope: 4.120425
+      outSlope: 4.120425
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.10869216
+      outWeight: 0.03785165
     - serializedVersion: 3
       time: 1
-      value: 0
-      inSlope: -4.0458164
-      outSlope: -4.0458164
+      value: -0.89998484
+      inSlope: -4.6785593
+      outSlope: -4.6785593
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.04076929
+      inWeight: 0.0405429
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

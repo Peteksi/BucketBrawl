@@ -1,4 +1,5 @@
 using Fusion;
+using UnityEngine;
 
 public struct CustomTickTimer : INetworkStruct
 {
@@ -16,10 +17,21 @@ public struct CustomTickTimer : INetworkStruct
         if (runner == false || runner.IsRunning == false)
             return new CustomTickTimer();
 
-        CustomTickTimer fromTicks = new CustomTickTimer();
-        fromTicks._target = (int)runner.Simulation.Tick + ticks;
-        fromTicks._initialTick = runner.Simulation.Tick;
+        CustomTickTimer fromTicks = new()
+        {
+            _target = (int)runner.Simulation.Tick + ticks,
+            _initialTick = runner.Simulation.Tick
+        };
         return fromTicks;
+    }
+
+
+    public static CustomTickTimer CreateFromSeconds(NetworkRunner runner, float seconds)
+    {
+        if (runner == false || runner.IsRunning == false)
+            return new CustomTickTimer();
+
+        return CreateFromTicks(runner, Mathf.RoundToInt(seconds / runner.DeltaTime));
     }
 
 
