@@ -27,10 +27,9 @@ public class Player : NetworkBehaviour
         if (GetInput(out NetworkInputData combinedInputData))
         {
             var inputData = combinedInputData[playerIndex];
-
             var pressedButtons = inputData.Buttons.GetPressed(PreviousButtons);
-
             PreviousButtons = inputData.Buttons;
+
 
             // movement
 

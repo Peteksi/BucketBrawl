@@ -97,7 +97,7 @@ public class NetworkDebugStartGUI : Fusion.Behaviour {
     }
 
     if (EnableHotkeys) {
-      if (Input.GetKeyDown(KeyCode.I)) {
+      if (Input.GetKeyDown(KeyCode.S)) {
         _networkDebugStart.StartSinglePlayer();
       }
 
@@ -109,7 +109,7 @@ public class NetworkDebugStartGUI : Fusion.Behaviour {
         }
       }
 
-      if (Input.GetKeyDown(KeyCode.S)) {
+      if (Input.GetKeyDown(KeyCode.E)) {
         if (_isMultiplePeerMode) {
           StartServerWithClients(_networkDebugStart);
         } else {
@@ -133,13 +133,13 @@ public class NetworkDebugStartGUI : Fusion.Behaviour {
         }
       }
 
-      if (Input.GetKeyDown(KeyCode.P)) {
-        if (_isMultiplePeerMode) {
-          StartMultipleSharedClients(nds);
-        } else {
-          nds.StartSharedClient();
-        }
-      }
+      //if (Input.GetKeyDown(KeyCode.P)) {
+      //  if (_isMultiplePeerMode) {
+      //    StartMultipleSharedClients(nds);
+      //  } else {
+      //    nds.StartSharedClient();
+      //  }
+      //}
     }
   }
 
@@ -191,19 +191,19 @@ public class NetworkDebugStartGUI : Fusion.Behaviour {
           }
           GUILayout.EndHorizontal();
 
-          if (GUILayout.Button(EnableHotkeys ? "Start Single Player (I)" : "Start Single Player", GUILayout.Height(height))) {
+          if (GUILayout.Button(EnableHotkeys ? "Start Single Player (S)" : "Start Single Player", GUILayout.Height(height))) {
             nds.StartSinglePlayer();
           }
 
-          if (GUILayout.Button(EnableHotkeys ? "Start Shared Client (P)" : "Start Shared Client", GUILayout.Height(height))) {
-            if (_isMultiplePeerMode) {
-              StartMultipleSharedClients(nds);
-            } else {
-              nds.StartSharedClient();
-            }
-          }
+          //if (GUILayout.Button(EnableHotkeys ? "Start Shared Client (P)" : "Start Shared Client", GUILayout.Height(height))) {
+          //  if (_isMultiplePeerMode) {
+          //    StartMultipleSharedClients(nds);
+          //  } else {
+          //    nds.StartSharedClient();
+          //  }
+          //}
 
-          if (GUILayout.Button(EnableHotkeys ? "Start Server (S)" : "Start Server", GUILayout.Height(height))) {
+          if (GUILayout.Button(EnableHotkeys ? "Start Server (E)" : "Start Server", GUILayout.Height(height))) {
             if (_isMultiplePeerMode) {
               StartServerWithClients(nds);
 

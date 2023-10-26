@@ -7,9 +7,9 @@ public class Bucket : ItemBase
 {
     [HideInInspector] [Networked] public Vector3 Velocity { get; set; }
 
-    [HideInInspector][Networked] public float StartPositionY { get; set; }
+    [Networked] private float StartPositionY { get; set; }
 
-    [HideInInspector] [Networked] public CustomTickTimer FlyTimer { get; set; }
+    [Networked] private CustomTickTimer FlyTimer { get; set; }
 
     public AnimationCurve YMotionCurve;
 
