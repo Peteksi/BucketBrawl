@@ -7,9 +7,9 @@ using UnityEngine;
 [RequireComponent(typeof(CustomCharacterController), typeof(ItemSpawner))]
 public class Player : NetworkBehaviour
 {
-    [SerializeField] private int playerIndex;
-
     [Networked] public NetworkButtons PreviousButtons { get; set; }
+
+    [SerializeField] private int localPlayerIndex;
 
     private CustomCharacterController characterController;
     private ItemSpawner itemSpawner;
@@ -26,7 +26,7 @@ public class Player : NetworkBehaviour
     {
         if (GetInput(out NetworkInputData combinedInputData))
         {
-            var inputData = combinedInputData[playerIndex];
+            var inputData = combinedInputData[localPlayerIndex];
             var pressedButtons = inputData.Buttons.GetPressed(PreviousButtons);
             PreviousButtons = inputData.Buttons;
 

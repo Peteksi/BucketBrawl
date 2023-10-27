@@ -8,6 +8,7 @@ public class ItemSpawner : SimulationBehaviour
 {
     [SerializeField] NetworkPrefabRef itemPrefab;
 
+    [SerializeField] float offset;
 
     public void SetPrefab(NetworkPrefabRef prefab)
     {
@@ -23,7 +24,7 @@ public class ItemSpawner : SimulationBehaviour
 
         Runner.Spawn(
             itemPrefab,
-            transform.position,
+            transform.position + transform.forward * offset,
             Quaternion.LookRotation((Vector3)direction),
             Object.InputAuthority,
             (runner, o) =>
@@ -31,5 +32,12 @@ public class ItemSpawner : SimulationBehaviour
                 o.GetComponent<ItemBase>().Initialize((Vector3)direction, speed, flyTime);
             }
         );
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position + transform.forward * offset, .1f);
+        Gizmos.color = Color.white;
     }
 }

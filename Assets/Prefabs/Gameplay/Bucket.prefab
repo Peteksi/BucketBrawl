@@ -72,7 +72,7 @@ MonoBehaviour:
   m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
+  _interpolationDataSource: 2
   InterpolationSpace: 0
   InterpolationTarget: {fileID: 1895384707498305937}
   InterpolateErrorCorrection: 1
@@ -102,27 +102,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _Velocity: {x: 0, y: 0, z: 0}
-  _StartPositionY: 0
-  YMotionCurve:
+  sphereCastRadius: 0.175
+  sphereCastLength: 0.75
+  yMotionCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
-      inSlope: 4.120425
-      outSlope: 4.120425
+      value: -0.00000011920929
+      inSlope: 2.9662633
+      outSlope: 2.9662633
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.03785165
+      outWeight: 0.052734375
     - serializedVersion: 3
       time: 1
-      value: -0.89998484
-      inSlope: -4.6785593
-      outSlope: -4.6785593
+      value: -0.652905
+      inSlope: -4.8260922
+      outSlope: -4.8260922
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.0405429
+      inWeight: 0.056151688
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

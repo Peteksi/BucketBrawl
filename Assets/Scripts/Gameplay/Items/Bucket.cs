@@ -5,13 +5,16 @@ using Fusion;
 
 public class Bucket : ItemBase
 {
-    [HideInInspector] [Networked] public Vector3 Velocity { get; set; }
+    [HideInInspector][Networked] public Vector3 Velocity { get; set; }
 
     [Networked] private float StartPositionY { get; set; }
 
     [Networked] private CustomTickTimer FlyTimer { get; set; }
 
-    public AnimationCurve YMotionCurve;
+    [SerializeField] float sphereCastRadius;
+    [SerializeField] float sphereCastLength;
+
+    [SerializeField] AnimationCurve yMotionCurve;
 
 
     public override void Initialize(Vector3 direction, float speed, float flyTime)
@@ -29,18 +32,27 @@ public class Bucket : ItemBase
 
         var normalizedVelocity = Velocity.normalized;
 
-        if (Runner.GetPhysicsScene().Raycast(transform.position - normalizedVelocity * .5f,
-            normalizedVelocity, out var hitInfo, 1, LayerMask.GetMask("Wall")))
+        if (Runner.GetPhysicsScene().SphereCast(transform.position - transform.forward * (sphereCastLength * .5f),
+            sphereCastRadius, normalizedVelocity, out var hitInfo, sphereCastLength, LayerMask.GetMask("Wall")))
         {
             Velocity = Vector3.Reflect(Velocity, hitInfo.normal);
         }
 
         transform.position = new(
             transform.position.x,
-            StartPositionY + YMotionCurve.Evaluate(FlyTimer.NormalizedValue(Runner)),
+            StartPositionY + yMotionCurve.Evaluate(FlyTimer.NormalizedValue(Runner)),
             transform.position.z);
 
         if (FlyTimer.Expired(Runner)) Runner.Despawn(Object);
+    }
+
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position - transform.forward * sphereCastLength * .5f, sphereCastRadius);
+        Gizmos.DrawWireSphere(transform.position + transform.forward * sphereCastLength * .5f, sphereCastRadius);
+        Gizmos.color = Color.white;
     }
 }
 
