@@ -11,10 +11,14 @@ public class Bucket : ItemBase
 
     [Networked] private CustomTickTimer FlyTimer { get; set; }
 
-    [SerializeField] float sphereCastRadius;
-    [SerializeField] float sphereCastLength;
+    [SerializeField] float colliderRadius;
+    [SerializeField] float colliderLength;
+
+    [SerializeField] float hitBoxRadius;
 
     [SerializeField] AnimationCurve yMotionCurve;
+
+    private List<LagCompensatedHit> hits = new();
 
 
     public override void Initialize(Vector3 direction, float speed, float flyTime)
@@ -28,12 +32,22 @@ public class Bucket : ItemBase
 
     public override void FixedUpdateNetwork()
     {
+        MoveAndCollide();
+
+        HitboxCheck();
+
+        if (FlyTimer.Expired(Runner)) Runner.Despawn(Object);
+    }
+
+
+    private void MoveAndCollide()
+    {
         transform.position += Velocity * Runner.DeltaTime;
 
         var normalizedVelocity = Velocity.normalized;
 
-        if (Runner.GetPhysicsScene().SphereCast(transform.position - transform.forward * (sphereCastLength * .5f),
-            sphereCastRadius, normalizedVelocity, out var hitInfo, sphereCastLength, LayerMask.GetMask("Wall")))
+        if (Runner.GetPhysicsScene().SphereCast(transform.position - transform.forward * (colliderLength * .5f),
+            colliderRadius, normalizedVelocity, out var hitInfo, colliderLength, LayerMask.GetMask("Wall")))
         {
             Velocity = Vector3.Reflect(Velocity, hitInfo.normal);
         }
@@ -42,16 +56,41 @@ public class Bucket : ItemBase
             transform.position.x,
             StartPositionY + yMotionCurve.Evaluate(FlyTimer.NormalizedValue(Runner)),
             transform.position.z);
+    }
 
-        if (FlyTimer.Expired(Runner)) Runner.Despawn(Object);
+
+    private void HitboxCheck()
+    {
+        var inputAuthority = Object.InputAuthority;
+        var hitboxManager = Runner.LagCompensation;
+
+        var count = hitboxManager.OverlapSphere(transform.position, hitBoxRadius, inputAuthority, hits);
+
+        for (int i = 0; i < count; i++)
+        {
+            var other = hits[i].GameObject;
+            if (other != null)
+            {
+                if (other.TryGetComponent(out IBucketable bucketable) && bucketable.IsBucketable)
+                {
+                    bucketable.EquipBucket();
+                    Runner.Despawn(Object);
+                    break;
+                }
+            }
+        }
     }
 
 
     private void OnDrawGizmos()
     {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position - .5f * colliderLength * transform.forward, colliderRadius);
+        Gizmos.DrawWireSphere(transform.position + .5f * colliderLength * transform.forward, colliderRadius);
+
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position - transform.forward * sphereCastLength * .5f, sphereCastRadius);
-        Gizmos.DrawWireSphere(transform.position + transform.forward * sphereCastLength * .5f, sphereCastRadius);
+        Gizmos.DrawWireSphere(transform.position, hitBoxRadius);
+
         Gizmos.color = Color.white;
     }
 }

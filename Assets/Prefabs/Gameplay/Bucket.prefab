@@ -102,8 +102,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _Velocity: {x: 0, y: 0, z: 0}
-  sphereCastRadius: 0.175
-  sphereCastLength: 0.75
+  colliderRadius: 0.14
+  colliderLength: 0.51
+  hitBoxRadius: 0.5
   yMotionCurve:
     serializedVersion: 2
     m_Curve:
