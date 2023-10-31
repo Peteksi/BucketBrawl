@@ -18,7 +18,9 @@ public class Bucket : ItemBase
 
     [SerializeField] AnimationCurve yMotionCurve;
 
-    private List<LagCompensatedHit> hits = new();
+    List<LagCompensatedHit> hits = new();
+
+    int hitboxLayerMask = 1 << 8;
 
 
     public override void Initialize(Vector3 direction, float speed, float flyTime)
@@ -35,6 +37,8 @@ public class Bucket : ItemBase
         MoveAndCollide();
 
         HitboxCheck();
+
+        if (!Object || !Object.IsValid) return;
 
         if (FlyTimer.Expired(Runner)) Runner.Despawn(Object);
     }
@@ -55,7 +59,8 @@ public class Bucket : ItemBase
         transform.position = new(
             transform.position.x,
             StartPositionY + yMotionCurve.Evaluate(FlyTimer.NormalizedValue(Runner)),
-            transform.position.z);
+            transform.position.z
+        );
     }
 
 
@@ -64,14 +69,14 @@ public class Bucket : ItemBase
         var inputAuthority = Object.InputAuthority;
         var hitboxManager = Runner.LagCompensation;
 
-        var count = hitboxManager.OverlapSphere(transform.position, hitBoxRadius, inputAuthority, hits);
+        var count = hitboxManager.OverlapSphere(transform.position, hitBoxRadius, inputAuthority, hits, layerMask: hitboxLayerMask);
 
         for (int i = 0; i < count; i++)
         {
             var other = hits[i].GameObject;
             if (other != null)
             {
-                if (other.TryGetComponent(out IBucketable bucketable) && bucketable.IsBucketable)
+                if (other.TryGetComponent(out IBucketable bucketable) && bucketable.IsBucketable())
                 {
                     bucketable.EquipBucket();
                     Runner.Despawn(Object);

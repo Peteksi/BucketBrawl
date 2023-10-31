@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IBucketable
 {
-    public bool IsBucketable { get; protected set; }
+    public bool IsBucketable();
 
     public void EquipBucket();
 }

@@ -5,22 +5,35 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(CustomCharacterController), typeof(ItemSpawner))]
-public class Player : NetworkBehaviour
+public class Player : NetworkBehaviour, IBucketable
 {
     [Networked] public NetworkButtons PreviousButtons { get; set; }
 
-    [SerializeField] private int localPlayerIndex;
-
-    private CustomCharacterController characterController;
-    private ItemSpawner itemSpawner;
+    [Networked] private int CurrentState { get; set; }
 
 
-    private void Awake()
+
+    [SerializeField] int localPlayerIndex;
+
+    CustomCharacterController characterController;
+    ItemSpawner itemSpawner;
+
+    enum State
     {
-       characterController = GetComponent<CustomCharacterController>();
-       itemSpawner = GetComponent<ItemSpawner>();
+        Default = 0,
+        Bucketed = 1,
     }
 
+
+
+
+
+    #region Networked
+
+    public override void Spawned()
+    {
+        CurrentState = (int)State.Default;
+    }
 
     public override void FixedUpdateNetwork()
     {
@@ -47,4 +60,33 @@ public class Player : NetworkBehaviour
             } 
         }
     }
+
+    public bool IsBucketable()
+    {
+        return CurrentState == (int)State.Default;
+    }
+
+    public void EquipBucket()
+    {
+        CurrentState = (int)State.Bucketed;
+    }
+    #endregion
+
+
+
+
+
+    #region Local
+
+    private void Awake()
+    {
+        characterController = GetComponent<CustomCharacterController>();
+        itemSpawner = GetComponent<ItemSpawner>();
+    }
+
+    private void OnBucketedChanged()
+    {
+
+    }
+    #endregion
 }
