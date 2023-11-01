@@ -11,7 +11,7 @@
         "ExpansionFactor": 0.20000000298023225,
         "Optimize": false,
         "DebugBroadphase": false,
-        "DebugHistory": false,
+        "DebugHistory": true,
         "DebugColor": {
             "r": 0.0,
             "g": 1.0,

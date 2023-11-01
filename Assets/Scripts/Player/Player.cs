@@ -7,11 +7,15 @@ using UnityEngine;
 [RequireComponent(typeof(CustomCharacterController), typeof(ItemSpawner))]
 public class Player : NetworkBehaviour, IBucketable
 {
+
+    // Networked variables
+
     [Networked] public NetworkButtons PreviousButtons { get; set; }
 
     [Networked] private int CurrentState { get; set; }
 
 
+    // Local variables
 
     [SerializeField] int localPlayerIndex;
 
@@ -21,14 +25,12 @@ public class Player : NetworkBehaviour, IBucketable
     enum State
     {
         Default = 0,
-        Bucketed = 1,
+        Bucketed = 1
     }
 
 
 
-
-
-    #region Networked
+    // Network methods
 
     public override void Spawned()
     {
@@ -61,22 +63,21 @@ public class Player : NetworkBehaviour, IBucketable
         }
     }
 
+
     public bool IsBucketable()
     {
         return CurrentState == (int)State.Default;
     }
 
+
     public void EquipBucket()
     {
         CurrentState = (int)State.Bucketed;
     }
-    #endregion
 
 
 
-
-
-    #region Local
+    // Local methods
 
     private void Awake()
     {
@@ -88,5 +89,4 @@ public class Player : NetworkBehaviour, IBucketable
     {
 
     }
-    #endregion
 }
