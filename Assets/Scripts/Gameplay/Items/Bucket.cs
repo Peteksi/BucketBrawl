@@ -10,6 +10,8 @@ public class Bucket : ItemBase
 
     [HideInInspector] [Networked] public Vector3 Velocity { get; set; }
 
+    [Networked] private int CurrentState { get; set; }
+
     [Networked] private float StartPositionY { get; set; }
 
     [Networked] private CustomTickTimer FlyTimer { get; set; }
@@ -28,6 +30,13 @@ public class Bucket : ItemBase
 
     readonly int hitboxLayerMask = 1 << 8;
 
+    enum State
+    {
+        Grounded,
+        Flying,
+        Held
+    }
+
 
 
     // Network methods
@@ -38,18 +47,26 @@ public class Bucket : ItemBase
 
         Velocity = direction * speed;
         FlyTimer = CustomTickTimer.CreateFromSeconds(Runner, flyTime);
+
+        CurrentState = speed > 0 ? (int)State.Flying : (int)State.Grounded;
     }
 
 
     public override void FixedUpdateNetwork()
     {
-        MoveAndCollide();
-
-        HitboxCheck();
+        if (CurrentState == (int)State.Flying)
+        {
+            MoveAndCollide();
+            HitboxQuery();
+        }
 
         if (!Object || !Object.IsValid) return;
 
-        if (FlyTimer.Expired(Runner)) Runner.Despawn(Object);
+        if (FlyTimer.Expired(Runner))
+        {
+            CurrentState = (int)State.Grounded;
+            Velocity = Vector3.zero;
+        };
     }
 
 
@@ -63,6 +80,7 @@ public class Bucket : ItemBase
             colliderRadius, normalizedVelocity, out var hitInfo, colliderLength, LayerMask.GetMask("Wall")))
         {
             Velocity = Vector3.Reflect(Velocity, hitInfo.normal);
+            transform.rotation = Quaternion.LookRotation(Velocity);
         }
 
         transform.position = new(
@@ -73,7 +91,7 @@ public class Bucket : ItemBase
     }
 
 
-    private void HitboxCheck()
+    private void HitboxQuery()
     {
         var inputAuthority = Object.InputAuthority;
         var hitboxManager = Runner.LagCompensation;
@@ -113,4 +131,10 @@ public class Bucket : ItemBase
 
         Gizmos.color = Color.white;
     }
+
+
+    //public override void Render()
+    //{
+    //    transform.Rotate(200 * Time.deltaTime, 0, 0);
+    //}
 }

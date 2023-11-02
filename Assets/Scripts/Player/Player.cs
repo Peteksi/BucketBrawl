@@ -10,7 +10,9 @@ public class Player : NetworkBehaviour, IBucketable
 
     // Networked variables
 
-    [Networked] public NetworkButtons PreviousButtons { get; set; }
+    [Networked] private NetworkButtons PreviousButtons { get; set; }
+
+    [Networked] private Bucket HeldBucket { get; set; }
 
     [Networked] private int CurrentState { get; set; }
 
@@ -24,8 +26,8 @@ public class Player : NetworkBehaviour, IBucketable
 
     enum State
     {
-        Default = 0,
-        Bucketed = 1
+        Default,
+        Bucketed
     }
 
 
@@ -36,6 +38,7 @@ public class Player : NetworkBehaviour, IBucketable
     {
         CurrentState = (int)State.Default;
     }
+    
 
     public override void FixedUpdateNetwork()
     {
