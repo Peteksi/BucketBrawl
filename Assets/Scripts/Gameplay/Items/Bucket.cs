@@ -79,7 +79,7 @@ public class Bucket : ItemBase
         if (Runner.GetPhysicsScene().SphereCast(transform.position - transform.forward * (colliderLength * .5f),
             colliderRadius, normalizedVelocity, out var hitInfo, colliderLength, LayerMask.GetMask("Wall")))
         {
-            Velocity = Vector3.Reflect(Velocity, hitInfo.normal);
+            Velocity = Vector3.Reflect(Velocity, hitInfo.GetFaceNormal(transform.forward));
             transform.rotation = Quaternion.LookRotation(Velocity);
         }
 
@@ -96,7 +96,8 @@ public class Bucket : ItemBase
         var inputAuthority = Object.InputAuthority;
         var hitboxManager = Runner.LagCompensation;
 
-        var count = hitboxManager.OverlapSphere(transform.position, hitBoxRadius, inputAuthority, hits, layerMask: hitboxLayerMask);
+        var count = hitboxManager.OverlapSphere(transform.position, hitBoxRadius, inputAuthority, hits,
+            layerMask: hitboxLayerMask);
 
         for (int i = 0; i < count; i++)
         {
@@ -114,6 +115,12 @@ public class Bucket : ItemBase
                 }
             }
         }
+    }
+
+
+    public override bool IsPickable()
+    {
+        return CurrentState == (int)State.Grounded;
     }
 
 

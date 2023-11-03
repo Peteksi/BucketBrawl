@@ -1,8 +1,11 @@
 using ExitGames.Client.Photon.StructWrapping;
 using Fusion;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+
 
 [RequireComponent(typeof(CustomCharacterController), typeof(ItemSpawner))]
 public class Player : NetworkBehaviour, IBucketable
@@ -12,7 +15,7 @@ public class Player : NetworkBehaviour, IBucketable
 
     [Networked] private NetworkButtons PreviousButtons { get; set; }
 
-    [Networked] private Bucket HeldBucket { get; set; }
+    [Networked] private ItemBase HeldItem { get; set; }
 
     [Networked] private int CurrentState { get; set; }
 
@@ -21,13 +24,21 @@ public class Player : NetworkBehaviour, IBucketable
 
     [SerializeField] int localPlayerIndex;
 
+    [SerializeField] float itemPickupRadius;
+
     CustomCharacterController characterController;
     ItemSpawner itemSpawner;
+
+    List<LagCompensatedHit> itemQueryHits = new();
+
+    readonly int hitboxLayerMask = 1 << 8;
+
 
     enum State
     {
         Default,
-        Bucketed
+        Bucketed,
+        HoldingItem
     }
 
 
@@ -79,6 +90,30 @@ public class Player : NetworkBehaviour, IBucketable
     }
 
 
+    private ItemBase ItemQuery()
+    {
+        var inputAuthority = Object.InputAuthority;
+        var hitboxManager = Runner.LagCompensation;
+
+        var count = hitboxManager.OverlapSphere(transform.position, itemPickupRadius, inputAuthority,
+            itemQueryHits, layerMask: hitboxLayerMask);
+
+        for (int i = 0; i < count; i++)
+        {
+            var other = itemQueryHits[i].GameObject;
+
+            if (other != null && other.TryGetComponent(out ItemBase itemBase))
+            {
+                var directionToOther = other.transform.position - transform.position;
+
+                return itemBase;
+            }
+        }
+
+        return null;
+    }
+    
+
 
     // Local methods
 
@@ -88,8 +123,19 @@ public class Player : NetworkBehaviour, IBucketable
         itemSpawner = GetComponent<ItemSpawner>();
     }
 
-    private void OnBucketedChanged()
-    {
 
+    private void OnStateChanged()
+    {
+        
+    }
+
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = new(1, 1, 1, .1f);
+        CustomGizmos.DrawGizmoCircle(transform.position, transform.up, itemPickupRadius);
+        Gizmos.color = Color.white;
+
+        Handles.Label(transform.position, ((State)CurrentState).ToString());
     }
 }

@@ -725,6 +725,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   localPlayerIndex: 0
+  itemPickupRadius: 1.62
 --- !u!114 &6554890674992680411
 MonoBehaviour:
   m_ObjectHideFlags: 0
