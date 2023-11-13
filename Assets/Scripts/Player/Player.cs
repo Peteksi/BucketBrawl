@@ -31,7 +31,7 @@ public class Player : NetworkBehaviour, IBucketable
 
     List<LagCompensatedHit> itemQueryHits = new();
 
-    readonly int hitboxLayerMask = 1 << 8;
+    readonly int itemLayerMask = 1 << 8;
 
 
     enum State
@@ -72,7 +72,15 @@ public class Player : NetworkBehaviour, IBucketable
 
             if (pressedButtons.IsSet(NetworkInputButtons.Action))
             {
-                itemSpawner.Spawn(transform.forward, 20, .75f);
+                if (CurrentState == (int)State.Default)
+                {
+                    HeldItem = ItemQuery();
+                    if (HeldItem != null) { CurrentState = (int)State.HoldingItem; }
+                }
+                else
+                {
+                    HeldItem = null;
+                }
             } 
         }
     }
@@ -96,19 +104,32 @@ public class Player : NetworkBehaviour, IBucketable
         var hitboxManager = Runner.LagCompensation;
 
         var count = hitboxManager.OverlapSphere(transform.position, itemPickupRadius, inputAuthority,
-            itemQueryHits, layerMask: hitboxLayerMask);
+            itemQueryHits, layerMask: itemLayerMask);
+
+
+        // choose the item most directly in front of the player
+
+        var largestDot = -1f;
+        ItemBase largestDotItem = null;
 
         for (int i = 0; i < count; i++)
         {
             var other = itemQueryHits[i].GameObject;
 
-            if (other != null && other.TryGetComponent(out ItemBase itemBase))
+            if (other != null && other.TryGetComponent(out ItemBase itemBase) && itemBase.IsPickable())
             {
                 var directionToOther = other.transform.position - transform.position;
+                var dotToOther = Vector3.Dot(directionToOther.normalized, transform.forward);
 
-                return itemBase;
+                if (dotToOther >= largestDot)
+                {
+                    largestDot = dotToOther;
+                    largestDotItem = itemBase;
+                }
             }
         }
+
+        if (largestDotItem != null) return largestDotItem;
 
         return null;
     }
@@ -134,8 +155,10 @@ public class Player : NetworkBehaviour, IBucketable
     {
         Gizmos.color = new(1, 1, 1, .1f);
         CustomGizmos.DrawGizmoCircle(transform.position, transform.up, itemPickupRadius);
+
+        if (EditorApplication.isPlaying && Object != null && Object.IsValid && HeldItem != null) Gizmos.DrawLine(transform.position, HeldItem.transform.position);
         Gizmos.color = Color.white;
 
-        Handles.Label(transform.position, ((State)CurrentState).ToString());
+        if (EditorApplication.isPlaying && Object != null && Object.IsValid) Handles.Label(transform.position, ((State)CurrentState).ToString());
     }
 }

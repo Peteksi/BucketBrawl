@@ -28,7 +28,7 @@ public class Bucket : ItemBase
 
     List<LagCompensatedHit> hits = new();
 
-    readonly int hitboxLayerMask = 1 << 8;
+    readonly int playerLayerMask = 1 << 6;
 
     enum State
     {
@@ -97,7 +97,7 @@ public class Bucket : ItemBase
         var hitboxManager = Runner.LagCompensation;
 
         var count = hitboxManager.OverlapSphere(transform.position, hitBoxRadius, inputAuthority, hits,
-            layerMask: hitboxLayerMask);
+            layerMask: playerLayerMask);
 
         for (int i = 0; i < count; i++)
         {
