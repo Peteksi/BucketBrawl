@@ -97,7 +97,7 @@ namespace Fusion {
       }
 
       if (EnableHotkeys) {
-        if (Input.GetKeyDown(KeyCode.I)) {
+        if (Input.GetKeyDown(KeyCode.S)) {
           _networkDebugStart.StartSinglePlayer();
         }
 
@@ -109,7 +109,7 @@ namespace Fusion {
           }
         }
 
-        if (Input.GetKeyDown(KeyCode.S)) {
+        if (Input.GetKeyDown(KeyCode.E)) {
           if (_isMultiplePeerMode) {
             StartServerWithClients(_networkDebugStart);
           } else {
@@ -133,13 +133,13 @@ namespace Fusion {
           }
         }
 
-        if (Input.GetKeyDown(KeyCode.P)) {
-          if (_isMultiplePeerMode) {
-            StartMultipleSharedClients(nds);
-          } else {
-            nds.StartSharedClient();
-          }
-        }
+        //if (Input.GetKeyDown(KeyCode.P)) {
+        //  if (_isMultiplePeerMode) {
+        //    StartMultipleSharedClients(nds);
+        //  } else {
+        //    nds.StartSharedClient();
+        //  }
+        //}
       }
     }
 
@@ -191,19 +191,27 @@ namespace Fusion {
             }
             GUILayout.EndHorizontal();
 
-            if (GUILayout.Button(EnableHotkeys ? "Start Single Player (I)" : "Start Single Player", GUILayout.Height(height))) {
+            if (GUILayout.Button(EnableHotkeys ? "Start Single Player (S)" : "Start Single Player", GUILayout.Height(height))) {
               nds.StartSinglePlayer();
             }
 
-            if (GUILayout.Button(EnableHotkeys ? "Start Shared Client (P)" : "Start Shared Client", GUILayout.Height(height))) {
+            //if (GUILayout.Button(EnableHotkeys ? "Start Shared Client (P)" : "Start Shared Client", GUILayout.Height(height))) {
+            //  if (_isMultiplePeerMode) {
+            //    StartMultipleSharedClients(nds);
+            //  } else {
+            //    nds.StartSharedClient();
+            //  }
+            //}
+
+            if (GUILayout.Button(EnableHotkeys ? "Start Auto Host Or Client (A)" : "Start Auto Host Or Client", GUILayout.Height(height))) {
               if (_isMultiplePeerMode) {
-                StartMultipleSharedClients(nds);
+                StartMultipleAutoClients(nds);
               } else {
-                nds.StartSharedClient();
+                nds.StartAutoClient();
               }
             }
 
-            if (GUILayout.Button(EnableHotkeys ? "Start Server (S)" : "Start Server", GUILayout.Height(height))) {
+            if (GUILayout.Button(EnableHotkeys ? "Start Server (E)" : "Start Server", GUILayout.Height(height))) {
               if (_isMultiplePeerMode) {
                 StartServerWithClients(nds);
 
@@ -225,14 +233,6 @@ namespace Fusion {
                 StartMultipleClients(nds);
               } else {
                 nds.StartClient();
-              }
-            }
-
-            if (GUILayout.Button(EnableHotkeys ? "Start Auto Host Or Client (A)" : "Start Auto Host Or Client", GUILayout.Height(height))) {
-              if (_isMultiplePeerMode) {
-                StartMultipleAutoClients(nds);
-              } else {
-                nds.StartAutoClient();
               }
             }
 

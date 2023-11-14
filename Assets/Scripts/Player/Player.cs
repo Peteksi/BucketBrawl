@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-[RequireComponent(typeof(CustomCharacterController), typeof(ItemSpawner))]
+//[RequireComponent(typeof(CustomCharacterController), typeof(ItemSpawner))]
 public class Player : NetworkBehaviour, IBucketable
 {
 
@@ -26,7 +26,7 @@ public class Player : NetworkBehaviour, IBucketable
 
     [SerializeField] float itemPickupRadius;
 
-    CustomCharacterController characterController;
+    NetworkCharacterController characterController;
     ItemSpawner itemSpawner;
 
     List<LagCompensatedHit> itemQueryHits = new();
@@ -80,6 +80,7 @@ public class Player : NetworkBehaviour, IBucketable
                 else
                 {
                     HeldItem = null;
+                    CurrentState = (int)State.Default;
                 }
             } 
         }
@@ -88,7 +89,7 @@ public class Player : NetworkBehaviour, IBucketable
 
     public bool IsBucketable()
     {
-        return CurrentState == (int)State.Default;
+        return CurrentState != (int)State.Bucketed;
     }
 
 
@@ -140,14 +141,14 @@ public class Player : NetworkBehaviour, IBucketable
 
     private void Awake()
     {
-        characterController = GetComponent<CustomCharacterController>();
+        characterController = GetComponent<NetworkCharacterController>();
         itemSpawner = GetComponent<ItemSpawner>();
     }
 
 
-    private void OnStateChanged()
+    public override void Render()
     {
-        
+        if (HeldItem != null) HeldItem.transform.position = transform.position;
     }
 
 

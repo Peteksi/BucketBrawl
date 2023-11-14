@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemSpawner : SimulationBehaviour
+public class ItemSpawner : NetworkBehaviour
 {
     [SerializeField] NetworkPrefabRef itemPrefab;
 

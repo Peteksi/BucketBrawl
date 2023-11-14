@@ -630,8 +630,8 @@ GameObject:
   - component: {fileID: 261001896176969323}
   - component: {fileID: 8474246719978651729}
   - component: {fileID: 3648112609235528855}
+  - component: {fileID: 3459887085285486440}
   - component: {fileID: 5881018299641802138}
-  - component: {fileID: 6554890674992680411}
   - component: {fileID: 6546023696453605537}
   - component: {fileID: 479196487870265017}
   - component: {fileID: 8262406801919600899}
@@ -670,21 +670,17 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SortKey: 4027085052
   ObjectInterest: 1
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 0
-  AoiPositionSource: {fileID: 0}
-  Flags: 2305
-  NetworkGuid:
-    RawGuidValue: b6e78a786f3359b4dbd9bc5ed68874a5
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 0
+  Flags: 264449
   NestedObjects: []
   NetworkedBehaviours:
+  - {fileID: 3459887085285486440}
   - {fileID: 5881018299641802138}
-  - {fileID: 6554890674992680411}
-  - {fileID: 479196487870265017}
-  SimulationBehaviours:
   - {fileID: 6546023696453605537}
+  - {fileID: 479196487870265017}
 --- !u!143 &3648112609235528855
 CharacterController:
   m_ObjectHideFlags: 0
@@ -711,6 +707,24 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3459887085285486440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8799641991617790012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 378411a89480da345945c2f888327a2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gravity: -20
+  jumpImpulse: 8
+  acceleration: 10
+  braking: 10
+  maxSpeed: 2
+  rotationSpeed: 15
 --- !u!114 &5881018299641802138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -723,43 +737,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 560feefa6d0dc6f47be747863ff3c4fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   localPlayerIndex: 0
   itemPickupRadius: 1.62
---- !u!114 &6554890674992680411
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8799641991617790012}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 794bb85d5e1c98041a0d43dac9e9ca17, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  InterpolationSpace: 0
-  InterpolationTarget: {fileID: 3054650049224572449}
-  InterpolateErrorCorrection: 1
-  InterpolatedErrorCorrectionSettings:
-    MinRate: 3.3
-    MaxRate: 10
-    PosBlendStart: 0.25
-    PosBlendEnd: 1
-    PosMinCorrection: 0.025
-    PosTeleportDistance: 2
-    RotBlendStart: 0.1
-    RotBlendEnd: 0.5
-    RotTeleportRadians: 1.5
-  UseLegacySharedModeInterpolation: 0
-  TargetInterpolationDelay: 0.03
-  gravity: -20
-  acceleration: 15
-  braking: 15
-  maxSpeed: 3
-  _IsGrounded: 0
-  _Velocity: {x: 0, y: 0, z: 0}
 --- !u!114 &6546023696453605537
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -787,7 +766,6 @@ MonoBehaviour:
   m_Script: {fileID: 1039544458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   Config: 1
   BroadRadius: 0.5
   Offset: {x: 0, y: 0, z: 0}
@@ -808,7 +786,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Type: 2
   SphereRadius: 0.5
+  CapsuleRadius: 0
   BoxExtents: {x: 0, y: 0, z: 0}
+  CapsuleHeight: 0
   Offset: {x: 0, y: 0, z: 0}
   Root: {fileID: 0}
   GizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

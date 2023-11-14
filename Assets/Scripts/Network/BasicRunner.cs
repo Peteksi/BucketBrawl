@@ -21,11 +21,14 @@ public class BasicRunner : MonoBehaviour, INetworkRunnerCallbacks
         _runner = gameObject.GetComponent<NetworkRunner>();
         _runner.ProvideInput = true;
 
+        var _sceneInfo = new NetworkSceneInfo();
+        _sceneInfo.AddSceneRef(SceneRef.FromIndex(0));
+
         await _runner.StartGame(new StartGameArgs()
         {
             GameMode = gameMode,
             SessionName = "TestRoom",
-            Scene = SceneManager.GetActiveScene().buildIndex,
+            Scene = _sceneInfo,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
     }
@@ -67,11 +70,16 @@ public class BasicRunner : MonoBehaviour, INetworkRunnerCallbacks
 
 
     public void OnConnectedToServer(NetworkRunner runner) { }
-    public void OnDisconnectedFromServer(NetworkRunner runner) { }
+    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
+
 
 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
+
+
+    public void OnSceneLoadStart(NetworkRunner runner) { }
+    public void OnSceneLoadDone(NetworkRunner runner) { }
 
 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
@@ -79,8 +87,8 @@ public class BasicRunner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
-
-
-    public void OnSceneLoadStart(NetworkRunner runner) { }
-    public void OnSceneLoadDone(NetworkRunner runner) { }
+    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
+    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
 }

@@ -7,7 +7,7 @@ public struct CustomTickTimer : INetworkStruct
     private int _initialTick;
 
     public bool Expired(NetworkRunner runner) => runner.IsRunning && _target > 0
-      && (Tick)_target <= runner.Simulation.Tick;
+      && (Tick)_target <= runner.Tick;
 
     public bool IsRunning => _target > 0;
 
@@ -19,8 +19,8 @@ public struct CustomTickTimer : INetworkStruct
 
         CustomTickTimer fromTicks = new()
         {
-            _target = (int)runner.Simulation.Tick + ticks,
-            _initialTick = runner.Simulation.Tick
+            _target = (int)runner.Tick + ticks,
+            _initialTick = runner.Tick
         };
         return fromTicks;
     }
@@ -55,6 +55,6 @@ public struct CustomTickTimer : INetworkStruct
         if (IsRunning == false || Expired(runner))
             return 0;
 
-        return runner.Simulation.Tick - _initialTick;
+        return runner.Tick - _initialTick;
     }
 }
