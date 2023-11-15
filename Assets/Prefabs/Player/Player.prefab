@@ -721,10 +721,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gravity: -20
   jumpImpulse: 8
-  acceleration: 10
-  braking: 10
-  maxSpeed: 2
-  rotationSpeed: 15
+  acceleration: 30
+  braking: 30
+  maxSpeed: 3
+  rotationSpeed: 360
 --- !u!114 &5881018299641802138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -753,7 +753,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemPrefab:
     RawGuidValue: add0d56792bbbd54e9dd5dc4fe53d91f
-  offset: 0.26
+  zOffset: 0
+  spawnOnStart: 0
 --- !u!114 &479196487870265017
 MonoBehaviour:
   m_ObjectHideFlags: 0

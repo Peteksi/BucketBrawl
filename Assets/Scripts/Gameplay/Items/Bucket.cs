@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using UnityEditor;
 
 public class Bucket : ItemBase
 {
@@ -137,6 +138,9 @@ public class Bucket : ItemBase
         Gizmos.DrawWireSphere(transform.position, hitBoxRadius);
 
         Gizmos.color = Color.white;
+
+        if (EditorApplication.isPlaying && Object != null && Object.IsValid) Handles.Label(transform.position, ((State)CurrentState).ToString());
+
     }
 
 

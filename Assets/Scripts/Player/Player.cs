@@ -130,7 +130,10 @@ public class Player : NetworkBehaviour, IBucketable
             }
         }
 
-        if (largestDotItem != null) return largestDotItem;
+        if (largestDotItem != null)
+        {
+            return largestDotItem;
+        }
 
         return null;
     }
@@ -146,9 +149,9 @@ public class Player : NetworkBehaviour, IBucketable
     }
 
 
-    public override void Render()
+    public void LateUpdate()
     {
-        if (HeldItem != null) HeldItem.transform.position = transform.position;
+        if (HeldItem != null) HeldItem.transform.position = transform.position + transform.forward;
     }
 
 

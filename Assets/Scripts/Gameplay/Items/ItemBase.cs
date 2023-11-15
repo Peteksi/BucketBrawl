@@ -8,4 +8,8 @@ public abstract class ItemBase : NetworkBehaviour
     public abstract bool IsPickable();
 
     public abstract void Initialize(Vector3 direction, float speed, float flyTime);
+
+    public abstract void OnPickup();
+
+    public abstract void OnThrow();
 }
