@@ -3,13 +3,17 @@ using UnityEngine;
 
 public struct CustomTickTimer : INetworkStruct
 {
-    private int _target;
-    private int _initialTick;
+    public static CustomTickTimer None => default(CustomTickTimer);
+    
 
     public bool Expired(NetworkRunner runner) => runner.IsRunning && _target > 0
       && (Tick)_target <= runner.Tick;
 
     public bool IsRunning => _target > 0;
+
+        
+    private int _target;
+    private int _initialTick;
 
 
     public static CustomTickTimer CreateFromTicks(NetworkRunner runner, int ticks)

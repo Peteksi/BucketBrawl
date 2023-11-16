@@ -11,5 +11,5 @@ public abstract class ItemBase : NetworkBehaviour
 
     public abstract void OnPickup();
 
-    public abstract void OnThrow();
+    public abstract void Throw(Vector3 direction, float speed, float flyTime);
 }

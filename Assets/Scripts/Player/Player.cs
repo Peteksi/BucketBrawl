@@ -75,12 +75,17 @@ public class Player : NetworkBehaviour, IBucketable
                 if (CurrentState == (int)State.Default)
                 {
                     HeldItem = ItemQuery();
-                    if (HeldItem != null) { CurrentState = (int)State.HoldingItem; }
+                    if (HeldItem != null)
+                    {
+                        CurrentState = (int)State.HoldingItem;
+                        HeldItem.OnPickup();
+                    }
                 }
                 else
                 {
-                    HeldItem = null;
                     CurrentState = (int)State.Default;
+                    HeldItem.Throw(transform.forward, 20, .75f);
+                    HeldItem = null;
                 }
             } 
         }

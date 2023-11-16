@@ -44,12 +44,7 @@ public class Bucket : ItemBase
 
     public override void Initialize(Vector3 direction, float speed, float flyTime)
     {
-        StartPositionY = transform.position.y;
-
-        Velocity = direction * speed;
-        FlyTimer = CustomTickTimer.CreateFromSeconds(Runner, flyTime);
-
-        CurrentState = speed > 0 ? (int)State.Flying : (int)State.Grounded;
+        
     }
 
 
@@ -67,6 +62,7 @@ public class Bucket : ItemBase
         {
             CurrentState = (int)State.Grounded;
             Velocity = Vector3.zero;
+            FlyTimer = CustomTickTimer.None;
         };
     }
 
@@ -122,6 +118,23 @@ public class Bucket : ItemBase
     public override bool IsPickable()
     {
         return CurrentState == (int)State.Grounded;
+    }
+
+
+    public override void OnPickup()
+    {
+        CurrentState = (int)State.Held;
+    }
+
+
+    public override void Throw(Vector3 direction, float speed, float flyTime)
+    {
+        CurrentState = (int)State.Flying;
+        StartPositionY = transform.position.y;
+        FlyTimer = CustomTickTimer.CreateFromSeconds(Runner, flyTime);
+
+        Velocity = direction * speed;
+        transform.rotation = Quaternion.LookRotation(direction);
     }
 
 
