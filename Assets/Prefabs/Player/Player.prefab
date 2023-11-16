@@ -217,7 +217,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4159133425784427209
 Transform:
   m_ObjectHideFlags: 0
@@ -739,6 +739,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localPlayerIndex: 0
   itemPickupRadius: 1.62
+  itemHoldOffset: 1
 --- !u!114 &6546023696453605537
 MonoBehaviour:
   m_ObjectHideFlags: 0

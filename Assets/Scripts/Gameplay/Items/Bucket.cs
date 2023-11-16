@@ -35,7 +35,7 @@ public class Bucket : ItemBase
     {
         Grounded,
         Flying,
-        Held
+        Inactive
     }
 
 
@@ -107,7 +107,7 @@ public class Bucket : ItemBase
                 if (Vector3.Dot(directionToOther.normalized, Velocity.normalized) > 0)
                 {
                     bucketable.EquipBucket();
-                    Runner.Despawn(Object);
+                    CurrentState = (int)State.Inactive;
                     break;
                 }
             }
@@ -123,7 +123,7 @@ public class Bucket : ItemBase
 
     public override void OnPickup()
     {
-        CurrentState = (int)State.Held;
+        CurrentState = (int)State.Inactive;
     }
 
 

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public struct CustomTickTimer : INetworkStruct
 {
-    public static CustomTickTimer None => default(CustomTickTimer);
+    public static CustomTickTimer None => default;
     
 
     public bool Expired(NetworkRunner runner) => runner.IsRunning && _target > 0

@@ -26,6 +26,8 @@ public class Player : NetworkBehaviour, IBucketable
 
     [SerializeField] float itemPickupRadius;
 
+    [SerializeField] float itemHoldOffset;
+
     NetworkCharacterController characterController;
     ItemSpawner itemSpawner;
 
@@ -81,10 +83,12 @@ public class Player : NetworkBehaviour, IBucketable
                         HeldItem.OnPickup();
                     }
                 }
-                else
+                else if (CurrentState == (int)State.HoldingItem)
                 {
-                    CurrentState = (int)State.Default;
+                    HeldItem.transform.position = transform.position + transform.forward * itemHoldOffset;
                     HeldItem.Throw(transform.forward, 20, .75f);
+
+                    CurrentState = (int)State.Default;
                     HeldItem = null;
                 }
             } 
@@ -156,7 +160,7 @@ public class Player : NetworkBehaviour, IBucketable
 
     public void LateUpdate()
     {
-        if (HeldItem != null) HeldItem.transform.position = transform.position + transform.forward;
+        if (HeldItem != null) HeldItem.transform.position = transform.position + transform.forward * itemHoldOffset;
     }
 
 
