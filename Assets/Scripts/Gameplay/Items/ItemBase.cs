@@ -1,15 +1,108 @@
 using Fusion;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
-public abstract class ItemBase : NetworkBehaviour
+public class ItemBase : NetworkBehaviour
 {
-    public abstract bool IsPickable();
 
-    public abstract void Initialize(Vector3 direction, float speed, float flyTime);
+    // Networked variables
 
-    public abstract void OnPickup();
+    [HideInInspector] [Networked] public Vector3 Velocity { get; set; }
 
-    public abstract void Throw(Vector3 direction, float speed, float flyTime);
+    [Networked] protected int CurrentState { get; set; }
+
+    [Networked] private float StartPositionY { get; set; }
+
+    [Networked] private CustomTickTimer FlyTimer { get; set; }
+
+
+    // Local variables
+
+    [SerializeField] float colliderRadius;
+    [SerializeField] float colliderLength;
+
+    [SerializeField] AnimationCurve yMotionCurve;
+
+    protected enum State
+    {
+        Grounded,
+        Flying,
+        Inactive
+    }
+
+
+
+    // Network methods
+
+    public virtual void Initialize(Vector3 direction, float speed, float flyTime)
+    {
+
+    }
+
+
+    protected virtual void MoveAndCollide()
+    {
+        transform.position += Velocity * Runner.DeltaTime;
+
+        var normalizedVelocity = Velocity.normalized;
+
+        if (Runner.GetPhysicsScene().SphereCast(transform.position - transform.forward * (colliderLength * .5f),
+            colliderRadius, normalizedVelocity, out var hitInfo, colliderLength, LayerMask.GetMask("Wall")))
+        {
+            Velocity = Vector3.Reflect(Velocity, hitInfo.GetFaceNormal(transform.forward));
+            transform.rotation = Quaternion.LookRotation(Velocity);
+        }
+
+        transform.position = new(
+            transform.position.x,
+            StartPositionY + yMotionCurve.Evaluate(FlyTimer.NormalizedValue(Runner)),
+            transform.position.z
+        );
+
+        if (FlyTimer.Expired(Runner))
+        {
+            CurrentState = (int)State.Grounded;
+            Velocity = Vector3.zero;
+            FlyTimer = CustomTickTimer.None;
+        };
+    }
+
+
+    public virtual void Throw(Vector3 direction, float speed, float flyTime)
+    {
+        CurrentState = (int)State.Flying;
+        StartPositionY = transform.position.y;
+        FlyTimer = CustomTickTimer.CreateFromSeconds(Runner, flyTime);
+
+        Velocity = direction * speed;
+        transform.rotation = Quaternion.LookRotation(direction);
+    }
+
+
+    public virtual bool IsPickable()
+    {
+        return CurrentState == (int)State.Grounded;
+    }
+
+
+    public virtual void OnPickup()
+    {
+        CurrentState = (int)State.Inactive;
+    }
+
+
+
+    // Local methods
+
+    protected void DrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position - .5f * colliderLength * transform.forward, colliderRadius);
+        Gizmos.DrawWireSphere(transform.position + .5f * colliderLength * transform.forward, colliderRadius);
+
+        Gizmos.color = Color.white;
+        if (EditorApplication.isPlaying && Object != null && Object.IsValid) Handles.Label(transform.position, ((State)CurrentState).ToString());
+    }
 }
