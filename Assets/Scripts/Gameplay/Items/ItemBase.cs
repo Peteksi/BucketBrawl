@@ -38,7 +38,7 @@ public class ItemBase : NetworkBehaviour
 
     public virtual void Initialize(Vector3 direction, float speed, float flyTime)
     {
-
+        CurrentState = speed > 0 ? (int)State.Flying : (int)State.Grounded;
     }
 
 

@@ -6,5 +6,5 @@ public interface IBucketable
 {
     public bool IsBucketable();
 
-    public void EquipBucket();
+    public void EquipBucket(ItemBase item);
 }

@@ -28,7 +28,7 @@ public class ItemSpawner : NetworkBehaviour
     {
         if (!Runner.IsServer) return;
 
-        if (direction == null) direction = transform.forward;
+        direction ??= transform.forward;
 
         Runner.Spawn(
             itemPrefab,

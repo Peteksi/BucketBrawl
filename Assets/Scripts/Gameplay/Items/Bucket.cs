@@ -47,7 +47,7 @@ public class Bucket : ItemBase
 
                 if (Vector3.Dot(directionToOther.normalized, Velocity.normalized) > 0)
                 {
-                    bucketable.EquipBucket();
+                    bucketable.EquipBucket(this);
                     CurrentState = (int)State.Inactive;
                     break;
                 }

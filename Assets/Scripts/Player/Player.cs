@@ -17,6 +17,8 @@ public class Player : NetworkBehaviour, IBucketable
 
     [Networked] private ItemBase HeldItem { get; set; }
 
+    [Networked] private ItemBase WornItem { get; set; }
+
     [Networked] private int CurrentState { get; set; }
 
 
@@ -25,11 +27,12 @@ public class Player : NetworkBehaviour, IBucketable
     [SerializeField] int localPlayerIndex;
 
     [SerializeField] float itemPickupRadius;
+    [SerializeField] float itemPickupRadiusYOffset;
 
     [SerializeField] float itemHoldOffset;
+    [SerializeField] float itemWearOffset;
 
     NetworkCharacterController characterController;
-    ItemSpawner itemSpawner;
 
     List<LagCompensatedHit> itemQueryHits = new();
 
@@ -102,9 +105,10 @@ public class Player : NetworkBehaviour, IBucketable
     }
 
 
-    public void EquipBucket()
+    public void EquipBucket(ItemBase item)
     {
         CurrentState = (int)State.Bucketed;
+        WornItem = item;
     }
 
 
@@ -113,7 +117,10 @@ public class Player : NetworkBehaviour, IBucketable
         var inputAuthority = Object.InputAuthority;
         var hitboxManager = Runner.LagCompensation;
 
-        var count = hitboxManager.OverlapSphere(transform.position, itemPickupRadius, inputAuthority,
+        var queryPosition = transform.position;
+        queryPosition.y += itemPickupRadiusYOffset;
+
+        var count = hitboxManager.OverlapSphere(queryPosition, itemPickupRadius, inputAuthority,
             itemQueryHits, layerMask: itemLayerMask);
 
 
@@ -154,20 +161,38 @@ public class Player : NetworkBehaviour, IBucketable
     private void Awake()
     {
         characterController = GetComponent<NetworkCharacterController>();
-        itemSpawner = GetComponent<ItemSpawner>();
     }
 
 
     public void LateUpdate()
     {
-        if (HeldItem != null) HeldItem.transform.position = transform.position + transform.forward * itemHoldOffset;
+        if (HeldItem != null)
+        {
+            HeldItem.transform.SetPositionAndRotation(
+                transform.position + transform.forward * itemHoldOffset,
+                transform.rotation
+            );
+        }
+
+        if (WornItem != null)
+        {
+            var itemRotation = transform.rotation * Quaternion.Euler(0, 0, 180);
+
+            WornItem.transform.SetPositionAndRotation(
+                transform.position + transform.up * itemWearOffset,
+                itemRotation
+            );
+        }
     }
 
 
     private void OnDrawGizmos()
     {
+        var queryPosition = transform.position;
+        queryPosition.y += itemPickupRadiusYOffset;
+
         Gizmos.color = new(1, 1, 1, .1f);
-        CustomGizmos.DrawGizmoCircle(transform.position, transform.up, itemPickupRadius);
+        CustomGizmos.DrawGizmoCircle(queryPosition, transform.up, itemPickupRadius);
 
         if (EditorApplication.isPlaying && Object != null && Object.IsValid && HeldItem != null) Gizmos.DrawLine(transform.position, HeldItem.transform.position);
         Gizmos.color = Color.white;

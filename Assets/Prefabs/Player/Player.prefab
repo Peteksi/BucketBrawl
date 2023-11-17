@@ -723,7 +723,7 @@ MonoBehaviour:
   jumpImpulse: 8
   acceleration: 30
   braking: 30
-  maxSpeed: 3
+  maxSpeed: 3.5
   rotationSpeed: 360
 --- !u!114 &5881018299641802138
 MonoBehaviour:
@@ -739,7 +739,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localPlayerIndex: 0
   itemPickupRadius: 1.62
+  itemPickupRadiusYOffset: -0.42
   itemHoldOffset: 1
+  itemWearOffset: 0.7
 --- !u!114 &6546023696453605537
 MonoBehaviour:
   m_ObjectHideFlags: 0
