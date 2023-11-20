@@ -5,6 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using BucketBrawl;
+using UnityEngine.UIElements;
 
 
 //[RequireComponent(typeof(CustomCharacterController), typeof(ItemSpawner))]
@@ -29,8 +31,8 @@ public class Player : NetworkBehaviour, IBucketable
     [SerializeField] float itemPickupRadius;
     [SerializeField] float itemPickupRadiusYOffset;
 
-    [SerializeField] float itemHoldOffset;
-    [SerializeField] float itemWearOffset;
+    [SerializeField] Transform itemHoldTransform;
+    [SerializeField] Transform itemWearTransform;
 
     NetworkCharacterController characterController;
 
@@ -88,13 +90,13 @@ public class Player : NetworkBehaviour, IBucketable
                 }
                 else if (CurrentState == (int)State.HoldingItem)
                 {
-                    HeldItem.transform.position = transform.position + transform.forward * itemHoldOffset;
-                    HeldItem.Throw(transform.forward, 20, .75f);
+                    HeldItem.transform.position = itemHoldTransform.position;
+                    HeldItem.Throw(transform.forward, 20, .75f, 1f);
 
                     CurrentState = (int)State.Default;
                     HeldItem = null;
                 }
-            } 
+            }
         }
     }
 
@@ -126,7 +128,7 @@ public class Player : NetworkBehaviour, IBucketable
 
         // choose the item most directly in front of the player
 
-        var largestDot = -1f;
+        var largestDot = -2f;
         ItemBase largestDotItem = null;
 
         for (int i = 0; i < count; i++)
@@ -168,20 +170,12 @@ public class Player : NetworkBehaviour, IBucketable
     {
         if (HeldItem != null)
         {
-            HeldItem.transform.SetPositionAndRotation(
-                transform.position + transform.forward * itemHoldOffset,
-                transform.rotation
-            );
+            HeldItem.transform.SetPositionAndRotation(itemHoldTransform.position, itemHoldTransform.rotation);
         }
 
         if (WornItem != null)
         {
-            var itemRotation = transform.rotation * Quaternion.Euler(0, 0, 180);
-
-            WornItem.transform.SetPositionAndRotation(
-                transform.position + transform.up * itemWearOffset,
-                itemRotation
-            );
+            WornItem.transform.SetPositionAndRotation(itemWearTransform.position, itemWearTransform.rotation);
         }
     }
 
@@ -194,9 +188,16 @@ public class Player : NetworkBehaviour, IBucketable
         Gizmos.color = new(1, 1, 1, .1f);
         CustomGizmos.DrawCircle(queryPosition, transform.up, itemPickupRadius);
 
-        if (EditorApplication.isPlaying && Object != null && Object.IsValid && HeldItem != null) Gizmos.DrawLine(transform.position, HeldItem.transform.position);
+        if (EditorApplication.isPlaying && Object != null && Object.IsValid && HeldItem != null)
+            Gizmos.DrawLine(transform.position, HeldItem.transform.position);
+
         Gizmos.color = Color.white;
 
-        if (EditorApplication.isPlaying && Object != null && Object.IsValid) Handles.Label(transform.position, ((State)CurrentState).ToString());
+        GUIStyle style = new GUIStyle();
+        style.normal.textColor = Color.yellow;
+
+        if (EditorApplication.isPlaying && Object != null && Object.IsValid)
+            Handles.Label(transform.position, ((State)CurrentState).ToString(), style);
+
     }
 }

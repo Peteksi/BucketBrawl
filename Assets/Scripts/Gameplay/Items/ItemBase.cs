@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using BucketBrawl;
+using UnityEngine.UIElements;
+
 
 public class ItemBase : NetworkBehaviour
 {
@@ -14,6 +17,8 @@ public class ItemBase : NetworkBehaviour
     [Networked] protected int CurrentState { get; set; }
 
     [Networked] private float StartPositionY { get; set; }
+
+    [Networked] private float FlyHeight { get; set; }
 
     [Networked] private CustomTickTimer FlyTimer { get; set; }
 
@@ -53,6 +58,14 @@ public class ItemBase : NetworkBehaviour
 
     protected virtual void MoveAndCollide()
     {
+        if (FlyTimer.Expired(Runner))
+        {
+            CurrentState = (int)State.Grounded;
+            Velocity = Vector3.zero;
+            FlyTimer = CustomTickTimer.None;
+            return;
+        }
+
         transform.position += Velocity * Runner.DeltaTime;
 
         var normalizedVelocity = Velocity.normalized;
@@ -64,25 +77,25 @@ public class ItemBase : NetworkBehaviour
             transform.rotation = Quaternion.LookRotation(Velocity);
         }
 
-        transform.position = new(
-            transform.position.x,
-            StartPositionY + yMotionCurve.Evaluate(FlyTimer.NormalizedValue(Runner)),
-            transform.position.z
-        );
+        float yPosition;
 
-        if (FlyTimer.Expired(Runner))
+        if (FlyTimer.NormalizedValue(Runner) < .5f) {
+            yPosition = Easings.EaseOutQuad(FlyTimer.NormalizedValue(Runner) * 2) / 2;
+        }
+        else
         {
-            CurrentState = (int)State.Grounded;
-            Velocity = Vector3.zero;
-            FlyTimer = CustomTickTimer.None;
-        };
+            yPosition = .5f - Easings.EaseInQuad((FlyTimer.NormalizedValue(Runner) - .5f) * 2) / 2;
+        }
+
+        transform.position = new(transform.position.x, StartPositionY + FlyHeight * yPosition, transform.position.z);
     }
 
 
-    public virtual void Throw(Vector3 direction, float speed, float flyTime)
+    public virtual void Throw(Vector3 direction, float speed, float flyTime, float flyHeight)
     {
         CurrentState = (int)State.Flying;
         StartPositionY = transform.position.y;
+        FlyHeight = flyHeight;
         FlyTimer = CustomTickTimer.CreateFromSeconds(Runner, flyTime);
 
         Velocity = direction * speed;
@@ -118,6 +131,10 @@ public class ItemBase : NetworkBehaviour
         Gizmos.DrawWireSphere(transform.position + .5f * colliderLength * transform.forward, colliderRadius);
 
         Gizmos.color = Color.white;
-        if (EditorApplication.isPlaying && Object != null && Object.IsValid) Handles.Label(transform.position, ((State)CurrentState).ToString());
+
+        GUIStyle style = new GUIStyle();
+        style.normal.textColor = Color.cyan;
+
+        if (EditorApplication.isPlaying && Object != null && Object.IsValid) Handles.Label(transform.position, ((State)CurrentState).ToString(), style);
     }
 }

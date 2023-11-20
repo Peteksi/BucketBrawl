@@ -3,6 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using BucketBrawl;
+
 
 public class ItemSpawner : NetworkBehaviour
 {
@@ -24,7 +26,7 @@ public class ItemSpawner : NetworkBehaviour
     }
 
 
-    public void Spawn(Vector3? direction = null, float speed = 0, float flyTime = 0)
+    public void Spawn(Vector3? direction = null, float speed = 0, float flyTime = 0, float flyHeight = 0)
     {
         if (!Runner.IsServer) return;
 
