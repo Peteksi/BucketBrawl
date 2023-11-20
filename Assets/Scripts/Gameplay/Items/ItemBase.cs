@@ -20,8 +20,8 @@ public class ItemBase : NetworkBehaviour
 
     // Local variables
 
-    [SerializeField] float colliderRadius;
-    [SerializeField] float colliderLength;
+    [SerializeField] float colliderRadius = .15f;
+    [SerializeField] float colliderLength = .5f;
 
     [SerializeField] AnimationCurve yMotionCurve;
 
@@ -39,6 +39,15 @@ public class ItemBase : NetworkBehaviour
     public virtual void Initialize(Vector3 direction, float speed, float flyTime)
     {
         CurrentState = speed > 0 ? (int)State.Flying : (int)State.Grounded;
+    }
+
+
+    public override void FixedUpdateNetwork()
+    {
+        if (CurrentState == (int)State.Flying)
+        {
+            MoveAndCollide();
+        }
     }
 
 
@@ -96,7 +105,13 @@ public class ItemBase : NetworkBehaviour
 
     // Local methods
 
-    protected void DrawGizmos()
+    private void OnDrawGizmos()
+    {
+        DrawGizmos();
+    }
+
+
+    public virtual void DrawGizmos()
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position - .5f * colliderLength * transform.forward, colliderRadius);

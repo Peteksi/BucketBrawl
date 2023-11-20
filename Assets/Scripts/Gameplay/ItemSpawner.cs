@@ -42,10 +42,13 @@ public class ItemSpawner : NetworkBehaviour
         );
     }
 
+
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawSphere(transform.position + transform.forward * zOffset, .1f);
+        Gizmos.color = new(0, 1, 1, .5f);
+
+        Gizmos.DrawSphere(transform.position + transform.forward * zOffset, .075f);
+        CustomGizmos.DrawCircle(transform.position + transform.forward * zOffset, transform.up, .5f);
         Gizmos.color = Color.white;
     }
 }

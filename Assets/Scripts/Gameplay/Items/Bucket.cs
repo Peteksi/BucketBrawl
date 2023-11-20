@@ -67,10 +67,4 @@ public class Bucket : ItemBase
         Gizmos.DrawWireSphere(transform.position, hitBoxRadius);
         Gizmos.color = Color.white;
     }
-
-
-    //public override void Render()
-    //{
-    //    transform.Rotate(200 * Time.deltaTime, 0, 0);
-    //}
 }

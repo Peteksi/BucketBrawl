@@ -192,7 +192,7 @@ public class Player : NetworkBehaviour, IBucketable
         queryPosition.y += itemPickupRadiusYOffset;
 
         Gizmos.color = new(1, 1, 1, .1f);
-        CustomGizmos.DrawGizmoCircle(queryPosition, transform.up, itemPickupRadius);
+        CustomGizmos.DrawCircle(queryPosition, transform.up, itemPickupRadius);
 
         if (EditorApplication.isPlaying && Object != null && Object.IsValid && HeldItem != null) Gizmos.DrawLine(transform.position, HeldItem.transform.position);
         Gizmos.color = Color.white;

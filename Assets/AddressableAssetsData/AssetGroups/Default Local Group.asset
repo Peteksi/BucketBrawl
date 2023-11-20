@@ -32,6 +32,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 20cca059707553d47abf2ac5eb7a0b00
+    m_Address: Assets/Prefabs/Gameplay/BasicItem.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fb4a5aa4c123d3a4da6cf1f72ebd3e4d, type: 2}
   m_SchemaSet:
