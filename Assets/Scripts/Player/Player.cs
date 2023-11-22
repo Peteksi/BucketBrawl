@@ -28,13 +28,15 @@ public class Player : NetworkBehaviour, IBucketable
 
     [SerializeField] int localPlayerIndex;
 
+    [Range(0, 1)] [SerializeField] float bucketedSpeedMultiplier;
+
     [SerializeField] float itemPickupRadius;
     [SerializeField] float itemPickupRadiusYOffset;
 
     [SerializeField] Transform itemHoldTransform;
     [SerializeField] Transform itemWearTransform;
 
-    NetworkCharacterController characterController;
+    CustomCharacterController characterController;
 
     List<LagCompensatedHit> itemQueryHits = new();
 
@@ -72,10 +74,12 @@ public class Player : NetworkBehaviour, IBucketable
             var direction = new Vector3(inputData.Direction.x, 0, inputData.Direction.y);
             direction.Normalize();
 
+            if (CurrentState == (int)State.Bucketed) direction *= bucketedSpeedMultiplier;
+
             characterController.Move(Runner.DeltaTime * direction);
 
 
-            // throwing buckets
+            // collecting & throwing buckets
 
             if (pressedButtons.IsSet(NetworkInputButtons.Action))
             {
@@ -162,7 +166,7 @@ public class Player : NetworkBehaviour, IBucketable
 
     private void Awake()
     {
-        characterController = GetComponent<NetworkCharacterController>();
+        characterController = GetComponent<CustomCharacterController>();
     }
 
 
@@ -193,11 +197,10 @@ public class Player : NetworkBehaviour, IBucketable
 
         Gizmos.color = Color.white;
 
-        GUIStyle style = new GUIStyle();
+        GUIStyle style = new();
         style.normal.textColor = Color.yellow;
 
         if (EditorApplication.isPlaying && Object != null && Object.IsValid)
             Handles.Label(transform.position, ((State)CurrentState).ToString(), style);
-
     }
 }

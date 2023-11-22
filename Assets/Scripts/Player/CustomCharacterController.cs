@@ -1,106 +1,175 @@
-//using System;
-//using Fusion;
-//using UnityEngine;
+namespace BucketBrawl
+{
+    using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
+    using UnityEngine;
+    using Fusion;
 
-//[RequireComponent(typeof(CharacterController))]
-//[DisallowMultipleComponent]
-//// ReSharper disable once CheckNamespace
-//public class CustomCharacterController : CustomNetworkTransform
-//{
-//    [Header("Character Controller Settings")]
-//    [SerializeField] float gravity = -20.0f;
-//    [SerializeField] float acceleration = 10.0f;
-//    [SerializeField] float braking = 10.0f;
-//    [SerializeField] float maxSpeed = 2.0f;
+    [StructLayout(LayoutKind.Explicit)]
+    [NetworkStructWeaved(WORDS + 4)]
+    public unsafe struct CustomCCData : INetworkStruct
+    {
+        public const int WORDS = NetworkTRSPData.WORDS + 4;
+        public const int SIZE = WORDS * 4;
 
-//    [Networked]
-//    [HideInInspector]
-//    public bool IsGrounded { get; set; }
+        [FieldOffset(0)]
+        public NetworkTRSPData TRSPData;
 
-//    [Networked]
-//    [HideInInspector]
-//    public Vector3 Velocity { get; set; }
+        [FieldOffset((NetworkTRSPData.WORDS + 0) * Allocator.REPLICATE_WORD_SIZE)]
+        int _grounded;
 
-//    protected Vector3 DefaultTeleportInterpolationVelocity => Velocity;
+        [FieldOffset((NetworkTRSPData.WORDS + 1) * Allocator.REPLICATE_WORD_SIZE)]
+        Vector3Compressed _velocityData;
 
-//    protected Vector3 DefaultTeleportInterpolationAngularVelocity => new(0f, 0f, 0f);
+        public bool Grounded
+        {
+            get => _grounded == 1;
+            set => _grounded = (value ? 1 : 0);
+        }
 
-//    public CharacterController Controller { get; private set; }
+        public Vector3 Velocity
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _velocityData;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => _velocityData = value;
+        }
+    }
+
+    [DisallowMultipleComponent]
+    [RequireComponent(typeof(CharacterController))]
+    [NetworkBehaviourWeaved(CustomCCData.WORDS)]
+    // ReSharper disable once CheckNamespace
+    public sealed unsafe class CustomCharacterController : NetworkTRSP, INetworkTRSPTeleport, IBeforeAllTicks, IAfterAllTicks, IBeforeCopyPreviousState
+    {
+        new ref CustomCCData Data => ref ReinterpretState<CustomCCData>();
+
+        [Header("Character Controller Settings")]
+        public float gravity = -20.0f;
+        public float jumpImpulse = 8.0f;
+        public float acceleration = 10.0f;
+        public float braking = 10.0f;
+        public float maxSpeed = 2.0f;
+        public float rotationSpeed = 15.0f;
+
+        Tick _initial;
+        CharacterController _controller;
+
+        public Vector3 Velocity
+        {
+            get => Data.Velocity;
+            set => Data.Velocity = value;
+        }
+
+        public bool Grounded
+        {
+            get => Data.Grounded;
+            set => Data.Grounded = value;
+        }
+
+        public void Teleport(Vector3? position = null, Quaternion? rotation = null)
+        {
+            _controller.enabled = false;
+            NetworkTRSP.Teleport(this, transform, position, rotation);
+            _controller.enabled = true;
+        }
 
 
-//    protected override void Awake()
-//    {
-//        base.Awake();
-//        CacheController();
-//    }
+        public void Jump(bool ignoreGrounded = false, float? overrideImpulse = null)
+        {
+            if (Data.Grounded || ignoreGrounded)
+            {
+                var newVel = Data.Velocity;
+                newVel.y += overrideImpulse ?? jumpImpulse;
+                Data.Velocity = newVel;
+            }
+        }
 
+        public void Move(Vector3 direction)
+        {
+            var deltaTime = Runner.DeltaTime;
+            var previousPos = transform.position;
+            var moveVelocity = Data.Velocity;
 
-//    public override void Spawned()
-//    {
-//        base.Spawned();
-//        CacheController();
-//    }
+            direction = direction.normalized;
 
+            if (Data.Grounded && moveVelocity.y < 0)
+            {
+                moveVelocity.y = 0f;
+            }
 
-//    private void CacheController()
-//    {
-//        if (Controller == null)
-//        {
-//            Controller = GetComponent<CharacterController>();
+            moveVelocity.y += gravity * Runner.DeltaTime;
 
-//            //Assert.Check(Controller != null, $"An object with {nameof(NetworkCharacterControllerPrototype)} must also have a {nameof(CharacterController)} component.");
-//        }
-//    }
+            var horizontalVel = default(Vector3);
+            horizontalVel.x = moveVelocity.x;
+            horizontalVel.z = moveVelocity.z;
 
+            if (direction == default)
+            {
+                horizontalVel = Vector3.Lerp(horizontalVel, default, braking * deltaTime);
+            }
+            else
+            {
+                horizontalVel = Vector3.ClampMagnitude(horizontalVel + direction * acceleration * deltaTime, maxSpeed);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Runner.DeltaTime);
+            }
 
-//    //protected override void CopyToEngine()
-//    //{
-//    //    // Trick: CC must be disabled before resetting the transform state
-//    //    Controller.enabled = false;
+            moveVelocity.x = horizontalVel.x;
+            moveVelocity.z = horizontalVel.z;
 
-//    //    // Pull base (NetworkTransform) state from networked data buffer
-//    //    base.CopyToEngine();
+            _controller.Move(moveVelocity * deltaTime);
 
-//    //    // Re-enable CC
-//    //    Controller.enabled = true;
-//    //}
+            Data.Velocity = (transform.position - previousPos) * Runner.TickRate;
+            Data.Grounded = _controller.isGrounded;
+        }
 
+        public override void Spawned()
+        {
+            _initial = default;
+            TryGetComponent(out _controller);
+        }
 
-//    public virtual void Move(Vector3 direction)
-//    {
-//        var deltaTime = Runner.DeltaTime;
-//        var previousPos = transform.position;
-//        var moveVelocity = Velocity;
+        public override void Render()
+        {
+            NetworkTRSP.Render(this, transform, false, false, false, ref _initial);
+        }
 
-//        direction = direction.normalized;
+        void IBeforeAllTicks.BeforeAllTicks(bool resimulation, int tickCount)
+        {
+            CopyToEngine();
+        }
 
-//        if (IsGrounded && moveVelocity.y < 0)
-//        {
-//            moveVelocity.y = 0f;
-//        }
+        void IAfterAllTicks.AfterAllTicks(bool resimulation, int tickCount)
+        {
+            CopyToBuffer();
+        }
 
-//        moveVelocity.y += gravity * Runner.DeltaTime;
+        void IBeforeCopyPreviousState.BeforeCopyPreviousState()
+        {
+            CopyToBuffer();
+        }
 
-//        var horizontalVel = default(Vector3);
-//        horizontalVel.x = moveVelocity.x;
-//        horizontalVel.z = moveVelocity.z;
+        void Awake()
+        {
+            TryGetComponent(out _controller);
+        }
 
-//        if (direction == default)
-//        {
-//            horizontalVel = Vector3.Lerp(horizontalVel, default, braking * deltaTime);
-//        }
-//        else
-//        {
-//            horizontalVel = Vector3.ClampMagnitude(horizontalVel + direction * acceleration * deltaTime, maxSpeed);
-//            transform.rotation = Quaternion.LookRotation(direction);
-//        }
+        void CopyToBuffer()
+        {
+            Data.TRSPData.Position = transform.position;
+            Data.TRSPData.Rotation = transform.rotation;
+        }
 
-//        moveVelocity.x = horizontalVel.x;
-//        moveVelocity.z = horizontalVel.z;
+        void CopyToEngine()
+        {
+            // CC must be disabled before resetting the transform state
+            _controller.enabled = false;
 
-//        Controller.Move(moveVelocity * deltaTime);
+            // set position and rotation
+            transform.SetPositionAndRotation(Data.TRSPData.Position, Data.TRSPData.Rotation);
 
-//        Velocity = (transform.position - previousPos) * Runner.TickRate;
-//        IsGrounded = Controller.isGrounded;
-//    }
-//}
+            // Re-enable CC
+            _controller.enabled = true;
+        }
+    }
+}
