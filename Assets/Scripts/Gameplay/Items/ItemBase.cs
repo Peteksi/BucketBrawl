@@ -28,6 +28,8 @@ public class ItemBase : NetworkBehaviour
     [SerializeField] float colliderRadius = .15f;
     [SerializeField] float colliderLength = .5f;
 
+    [SerializeField] float groundRaycastLength = .5f;
+
     [SerializeField] AnimationCurve yMotionCurve;
 
     protected enum State
@@ -58,13 +60,6 @@ public class ItemBase : NetworkBehaviour
 
     protected virtual void MoveAndCollide()
     {
-        if (FlyTimer.Expired(Runner))
-        {
-            CurrentState = (int)State.Grounded;
-            Velocity = Vector3.zero;
-            FlyTimer = CustomTickTimer.None;
-            return;
-        }
 
         transform.position += Velocity * Runner.DeltaTime;
 
@@ -77,17 +72,26 @@ public class ItemBase : NetworkBehaviour
             transform.rotation = Quaternion.LookRotation(Velocity);
         }
 
-        float yPosition;
+        float yScalar;
 
         if (FlyTimer.NormalizedValue(Runner) < .5f) {
-            yPosition = Easings.EaseOutQuad(FlyTimer.NormalizedValue(Runner) * 2) / 2;
+            yScalar = Easings.EaseOutCubic(FlyTimer.NormalizedValue(Runner) * 2) / 2;
         }
         else
         {
-            yPosition = .5f - Easings.EaseInQuad((FlyTimer.NormalizedValue(Runner) - .5f) * 2) / 2;
+            yScalar = .5f - Easings.EaseInCubic((FlyTimer.NormalizedValue(Runner) - .5f) * 2) / 2;
         }
 
-        transform.position = new(transform.position.x, StartPositionY + FlyHeight * yPosition, transform.position.z);
+        float yPosition = StartPositionY + FlyHeight * yScalar;
+        float yDelta = transform.position.y - yPosition;
+
+        transform.position = new(transform.position.x, yPosition, transform.position.z);
+
+        if (FlyTimer.Expired(Runner))
+        {
+            Velocity = new(Velocity.x, yDelta, Velocity.z);
+            FlyTimer = CustomTickTimer.None;
+        }
     }
 
 
@@ -129,10 +133,11 @@ public class ItemBase : NetworkBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position - .5f * colliderLength * transform.forward, colliderRadius);
         Gizmos.DrawWireSphere(transform.position + .5f * colliderLength * transform.forward, colliderRadius);
+        Gizmos.DrawLine(transform.position, transform.position + transform.up * -groundRaycastLength);
 
         Gizmos.color = Color.white;
 
-        GUIStyle style = new GUIStyle();
+        GUIStyle style = new();
         style.normal.textColor = Color.cyan;
 
         if (EditorApplication.isPlaying && Object != null && Object.IsValid) Handles.Label(transform.position, ((State)CurrentState).ToString(), style);

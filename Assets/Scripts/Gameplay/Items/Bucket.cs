@@ -21,9 +21,10 @@ public class Bucket : ItemBase
 
     public override void FixedUpdateNetwork()
     {
+        base.FixedUpdateNetwork();
+
         if (CurrentState == (int)State.Flying)
         {
-            MoveAndCollide();
             HitboxQuery();
         }
     }

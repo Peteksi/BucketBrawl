@@ -74,9 +74,10 @@ public class Player : NetworkBehaviour, IBucketable
             var direction = new Vector3(inputData.Direction.x, 0, inputData.Direction.y);
             direction.Normalize();
 
-            if (CurrentState == (int)State.Bucketed) direction *= bucketedSpeedMultiplier;
+            var speedMultiplier = 1f;
+            if (CurrentState == (int)State.Bucketed) speedMultiplier = bucketedSpeedMultiplier;
 
-            characterController.Move(Runner.DeltaTime * direction);
+            characterController.Move(Runner.DeltaTime * direction, speedMultiplier);
 
 
             // collecting & throwing buckets
@@ -95,7 +96,7 @@ public class Player : NetworkBehaviour, IBucketable
                 else if (CurrentState == (int)State.HoldingItem)
                 {
                     HeldItem.transform.position = itemHoldTransform.position;
-                    HeldItem.Throw(transform.forward, 20, .75f, 1f);
+                    HeldItem.Throw(transform.forward, 20, .75f, 4f);
 
                     CurrentState = (int)State.Default;
                     HeldItem = null;

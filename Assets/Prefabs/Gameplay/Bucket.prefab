@@ -90,7 +90,7 @@ MonoBehaviour:
   _Velocity: {x: 0, y: 0, z: 0}
   colliderRadius: 0.14
   colliderLength: 0.51
-  hitBoxRadius: 0.5
+  groundRaycastLength: 0.38
   yMotionCurve:
     serializedVersion: 2
     m_Curve:
@@ -115,6 +115,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  hitBoxRadius: 0.5
 --- !u!114 &5344601189045266295
 MonoBehaviour:
   m_ObjectHideFlags: 0
