@@ -96,7 +96,7 @@ public class Player : NetworkBehaviour, IBucketable
                 else if (CurrentState == (int)State.HoldingItem)
                 {
                     HeldItem.transform.position = itemHoldTransform.position;
-                    HeldItem.Throw(transform.forward, 20, .75f, 4f);
+                    HeldItem.Throw(transform.forward, 20, .75f, 1.5f);
 
                     CurrentState = (int)State.Default;
                     HeldItem = null;

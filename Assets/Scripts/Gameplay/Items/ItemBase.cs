@@ -28,9 +28,11 @@ public class ItemBase : NetworkBehaviour
     [SerializeField] float colliderRadius = .15f;
     [SerializeField] float colliderLength = .5f;
 
-    [SerializeField] float groundRaycastLength = .5f;
+    [SerializeField] float colliderHeight = .7f;
 
     [SerializeField] AnimationCurve yMotionCurve;
+
+    private float groundDistanceOnThrow;
 
     protected enum State
     {
@@ -72,37 +74,56 @@ public class ItemBase : NetworkBehaviour
             transform.rotation = Quaternion.LookRotation(Velocity);
         }
 
-        float yScalar;
-        float yPosition;
+        float yPosition = EvaluateThrowHeight(FlyTimer.NormalizedValue(Runner));
 
-        if (FlyTimer.NormalizedValue(Runner) < .5f) {
-            yScalar = Easings.EaseOutCubic(FlyTimer.NormalizedValue(Runner) * 2) / 2;
-            yPosition = StartPositionY + FlyHeight * yScalar;
-        }
-        else
-        {
-            yScalar = .5f - Easings.EaseInCubic((FlyTimer.NormalizedValue(Runner) - .5f) * 2) / 2;
-            yPosition = StartPositionY + FlyHeight * yScalar; // change
-        }
-
-        float yDelta = transform.position.y - yPosition;
+        //float yDelta = transform.position.y - yPosition;
 
         transform.position = new(transform.position.x, yPosition, transform.position.z);
 
         if (FlyTimer.Expired(Runner))
         {
-            Velocity = new(Velocity.x, yDelta, Velocity.z);
+            Velocity = Vector3.zero;
             FlyTimer = CustomTickTimer.None;
+            CurrentState = (int)State.Grounded;
         }
+    }
+
+
+    protected virtual float EvaluateThrowHeight(float time)
+    {
+        float yScalar;
+        float yPosition;
+
+        if (time < .5f)
+        {
+            yScalar = Easings.EaseOutCubic(time * 2) / 2;
+            yPosition = StartPositionY + FlyHeight * yScalar;
+        }
+        else
+        {
+            yScalar = .5f - Easings.EaseInCubic((time - .5f) * 2) / 2;
+            yPosition = (StartPositionY - groundDistanceOnThrow)
+                + (FlyHeight + groundDistanceOnThrow) * yScalar;
+        }
+
+        return yPosition;
     }
 
 
     public virtual void Throw(Vector3 direction, float speed, float flyTime, float flyHeight)
     {
         CurrentState = (int)State.Flying;
+
         StartPositionY = transform.position.y;
         FlyHeight = flyHeight;
         FlyTimer = CustomTickTimer.CreateFromSeconds(Runner, flyTime);
+
+        groundDistanceOnThrow = 0;
+        if (Runner.GetPhysicsScene().Raycast(transform.position, -transform.up, out var hitInfo, colliderHeight,
+            LayerMask.GetMask("Wall")))
+        {
+            groundDistanceOnThrow = hitInfo.distance - colliderHeight * .5f;
+        }
 
         Velocity = direction * speed;
         transform.rotation = Quaternion.LookRotation(direction);
@@ -135,7 +156,7 @@ public class ItemBase : NetworkBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position - .5f * colliderLength * transform.forward, colliderRadius);
         Gizmos.DrawWireSphere(transform.position + .5f * colliderLength * transform.forward, colliderRadius);
-        Gizmos.DrawLine(transform.position, transform.position + transform.up * -groundRaycastLength);
+        Gizmos.DrawLine(transform.position - transform.up * -colliderHeight / 2, transform.position + transform.up * -colliderHeight / 2);
 
         Gizmos.color = Color.white;
 

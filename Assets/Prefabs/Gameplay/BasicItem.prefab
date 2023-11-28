@@ -125,6 +125,7 @@ MonoBehaviour:
   _Velocity: {x: 0, y: 0, z: 0}
   colliderRadius: 0.15
   colliderLength: 0.5
+  groundRaycastLength: 0.35
   yMotionCurve:
     serializedVersion: 2
     m_Curve:
@@ -178,7 +179,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Type: 2
-  SphereRadius: 0.5
+  SphereRadius: 0.35
   CapsuleRadius: 0
   BoxExtents: {x: 0, y: 0, z: 0}
   CapsuleHeight: 0
@@ -198,7 +199,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Config: 3
-  BroadRadius: 0.5
+  BroadRadius: 0.35
   Offset: {x: 0, y: 0, z: 0}
   GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   Hitboxes:
