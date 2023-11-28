@@ -73,16 +73,18 @@ public class ItemBase : NetworkBehaviour
         }
 
         float yScalar;
+        float yPosition;
 
         if (FlyTimer.NormalizedValue(Runner) < .5f) {
             yScalar = Easings.EaseOutCubic(FlyTimer.NormalizedValue(Runner) * 2) / 2;
+            yPosition = StartPositionY + FlyHeight * yScalar;
         }
         else
         {
             yScalar = .5f - Easings.EaseInCubic((FlyTimer.NormalizedValue(Runner) - .5f) * 2) / 2;
+            yPosition = StartPositionY + FlyHeight * yScalar; // change
         }
 
-        float yPosition = StartPositionY + FlyHeight * yScalar;
         float yDelta = transform.position.y - yPosition;
 
         transform.position = new(transform.position.x, yPosition, transform.position.z);
