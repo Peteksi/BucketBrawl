@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using BucketBrawl;
-using UnityEngine.UIElements;
+using Fusion.Addons.Physics;
 
 
 public class ItemBase : NetworkBehaviour
@@ -30,9 +30,18 @@ public class ItemBase : NetworkBehaviour
 
     [SerializeField] float colliderHeight = .7f;
 
-    [SerializeField] AnimationCurve yMotionCurve;
-
     private float groundDistanceOnThrow;
+
+    private ChangeDetector changes;
+
+    NetworkRigidbody3D RigidBody
+    {
+        get
+        {
+            if (this.TryGetComponent<NetworkRigidbody3D>(out var rb)) { return rb; }
+            else { return null; }
+        }
+    }
 
     protected enum State
     {
@@ -51,11 +60,35 @@ public class ItemBase : NetworkBehaviour
     }
 
 
+    public override void Spawned()
+    {
+        changes = GetChangeDetector(ChangeDetector.Source.SimulationState);
+    }
+
+
     public override void FixedUpdateNetwork()
     {
         if (CurrentState == (int)State.Flying)
         {
             MoveAndCollide();
+        }
+
+        HandleChangeDetection();
+    }
+
+
+    private void OnStateChanged(int previous, int current)
+    {
+        if (previous == current) return;
+
+        if (current == (int)State.Grounded)
+        {
+            if (RigidBody != null) RigidBody.RBIsKinematic = false;
+        }
+
+        if (previous == (int)State.Grounded)
+        {
+            if (RigidBody != null) RigidBody.RBIsKinematic = true;
         }
     }
 
@@ -139,6 +172,22 @@ public class ItemBase : NetworkBehaviour
     public virtual void OnPickup()
     {
         CurrentState = (int)State.Inactive;
+    }
+
+
+    private void HandleChangeDetection()
+    {
+        foreach (var change in changes.DetectChanges(this, out var previousBuffer, out var currentBuffer))
+        {
+            switch (change)
+            {
+                case nameof(CurrentState):
+                    var reader = GetPropertyReader<int>(nameof(CurrentState));
+                    var (previous, current) = reader.Read(previousBuffer, currentBuffer);
+                    OnStateChanged(previous, current);
+                    break;
+            }
+        }
     }
 
 

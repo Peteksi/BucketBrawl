@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using BucketBrawl;
 using UnityEngine.UIElements;
+using Fusion.Addons.Physics;
 
 
 //[RequireComponent(typeof(CustomCharacterController), typeof(ItemSpawner))]
@@ -41,6 +42,15 @@ public class Player : NetworkBehaviour, IBucketable
     List<LagCompensatedHit> itemQueryHits = new();
 
     readonly int itemLayerMask = 1 << 8;
+
+    NetworkRigidbody3D HeldItemRB
+    {
+        get
+        {
+            if (HeldItem.TryGetComponent<NetworkRigidbody3D>(out var rb)) { return rb; }
+            else { return null; }
+        }
+    }
 
 
     enum State
@@ -97,6 +107,7 @@ public class Player : NetworkBehaviour, IBucketable
                 {
                     HeldItem.transform.position = itemHoldTransform.position;
                     HeldItem.Throw(transform.forward, 20, .75f, 1.5f);
+                    //HeldItemRB.RBIsKinematic = false;
 
                     CurrentState = (int)State.Default;
                     HeldItem = null;
