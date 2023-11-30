@@ -55,17 +55,20 @@ namespace BucketBrawl
         Tick _initial;
         CharacterController _controller;
 
+
         public Vector3 Velocity
         {
             get => Data.Velocity;
             set => Data.Velocity = value;
         }
 
+
         public bool Grounded
         {
             get => Data.Grounded;
             set => Data.Grounded = value;
         }
+
 
         public void Teleport(Vector3? position = null, Quaternion? rotation = null)
         {
@@ -84,6 +87,7 @@ namespace BucketBrawl
                 Data.Velocity = newVel;
             }
         }
+
 
         public void Move(Vector3 direction, float scalar = 1)
         {
@@ -131,10 +135,17 @@ namespace BucketBrawl
             TryGetComponent(out _controller);
         }
 
+        void Awake()
+        {
+            TryGetComponent(out _controller);
+        }
+
         public override void Render()
         {
             NetworkTRSP.Render(this, transform, false, false, false, ref _initial);
         }
+
+        #region engine <-> buffer
 
         void IBeforeAllTicks.BeforeAllTicks(bool resimulation, int tickCount)
         {
@@ -149,11 +160,6 @@ namespace BucketBrawl
         void IBeforeCopyPreviousState.BeforeCopyPreviousState()
         {
             CopyToBuffer();
-        }
-
-        void Awake()
-        {
-            TryGetComponent(out _controller);
         }
 
         void CopyToBuffer()
@@ -173,5 +179,7 @@ namespace BucketBrawl
             // Re-enable CC
             _controller.enabled = true;
         }
+
+        #endregion
     }
 }

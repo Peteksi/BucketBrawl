@@ -32,7 +32,7 @@ public class Player : NetworkBehaviour, IBucketable
     [Range(0, 1)] [SerializeField] float bucketedSpeedMultiplier;
 
     [SerializeField] float itemPickupRadius;
-    [SerializeField] float itemPickupRadiusYOffset;
+    [SerializeField] Vector3 itemPickupRadiusOffset;
 
     [SerializeField] Transform itemHoldTransform;
     [SerializeField] Transform itemWearTransform;
@@ -43,14 +43,14 @@ public class Player : NetworkBehaviour, IBucketable
 
     readonly int itemLayerMask = 1 << 8;
 
-    NetworkRigidbody3D HeldItemRB
-    {
-        get
-        {
-            if (HeldItem.TryGetComponent<NetworkRigidbody3D>(out var rb)) { return rb; }
-            else { return null; }
-        }
-    }
+    //NetworkRigidbody3D HeldItemRB
+    //{
+    //    get
+    //    {
+    //        if (HeldItem.TryGetComponent<NetworkRigidbody3D>(out var rb)) { return rb; }
+    //        else { return null; }
+    //    }
+    //}
 
 
     enum State
@@ -136,7 +136,7 @@ public class Player : NetworkBehaviour, IBucketable
         var hitboxManager = Runner.LagCompensation;
 
         var queryPosition = transform.position;
-        queryPosition.y += itemPickupRadiusYOffset;
+        queryPosition.y += itemPickupRadiusOffset.y;
 
         var count = hitboxManager.OverlapSphere(queryPosition, itemPickupRadius, inputAuthority,
             itemQueryHits, layerMask: itemLayerMask);
@@ -198,8 +198,7 @@ public class Player : NetworkBehaviour, IBucketable
 
     private void OnDrawGizmos()
     {
-        var queryPosition = transform.position;
-        queryPosition.y += itemPickupRadiusYOffset;
+        var queryPosition = transform.position + itemPickupRadiusOffset;
 
         Gizmos.color = new(1, 1, 1, .1f);
         CustomGizmos.DrawCircle(queryPosition, transform.up, itemPickupRadius);
