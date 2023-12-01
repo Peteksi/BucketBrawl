@@ -102,7 +102,10 @@ public class ItemBase : NetworkBehaviour
         if (Runner.GetPhysicsScene().SphereCast(transform.position - transform.forward * (colliderLength * .5f),
             colliderRadius, normalizedVelocity, out var hitInfo, colliderLength, LayerMask.GetMask("Wall")))
         {
+            var yOld = Velocity.y;
             Velocity = Vector3.Reflect(Velocity, hitInfo.GetFaceNormal(transform.forward));
+            Velocity = new Vector3(Velocity.x, yOld, Velocity.z);
+
             transform.rotation = Quaternion.LookRotation(Velocity);
         }
 
