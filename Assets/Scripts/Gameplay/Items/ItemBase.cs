@@ -143,7 +143,7 @@ public class ItemBase : NetworkBehaviour
 
             float groundHeight = StartPositionY - groundDistanceOnThrow;
             //float difference = 
-            yPosition = groundHeight + (FlyHeight + groundDistanceOnThrow) * yScalar;
+            yPosition = groundHeight + (FlyHeight + groundDistanceOnThrow * 2) * yScalar;
         }
 
         return yPosition;
