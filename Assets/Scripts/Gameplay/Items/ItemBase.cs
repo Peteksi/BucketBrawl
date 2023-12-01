@@ -45,7 +45,7 @@ public class ItemBase : NetworkBehaviour
 
     protected enum State
     {
-        Grounded,
+        Default,
         Flying,
         Inactive
     }
@@ -56,7 +56,7 @@ public class ItemBase : NetworkBehaviour
 
     public virtual void Initialize(Vector3 direction, float speed, float flyTime)
     {
-        CurrentState = speed > 0 ? (int)State.Flying : (int)State.Grounded;
+        CurrentState = speed > 0 ? (int)State.Flying : (int)State.Default;
     }
 
 
@@ -81,12 +81,12 @@ public class ItemBase : NetworkBehaviour
     {
         if (previous == current) return;
 
-        if (current == (int)State.Grounded)
+        if (current == (int)State.Default)
         {
             if (RigidBody != null) RigidBody.RBIsKinematic = false;
         }
 
-        if (previous == (int)State.Grounded)
+        if (previous == (int)State.Default)
         {
             if (RigidBody != null) RigidBody.RBIsKinematic = true;
         }
@@ -95,7 +95,6 @@ public class ItemBase : NetworkBehaviour
 
     protected virtual void MoveAndCollide()
     {
-
         transform.position += Velocity * Runner.DeltaTime;
 
         var normalizedVelocity = Velocity.normalized;
@@ -107,17 +106,23 @@ public class ItemBase : NetworkBehaviour
             transform.rotation = Quaternion.LookRotation(Velocity);
         }
 
-        float yPosition = EvaluateThrowHeight(FlyTimer.NormalizedValue(Runner));
+        float yDelta = 0;
 
-        //float yDelta = transform.position.y - yPosition;
+        if (FlyTimer.IsRunning)
+        {
+            float yPosition = EvaluateThrowHeight(FlyTimer.NormalizedValue(Runner));
+            yDelta = yPosition - transform.position.y;
 
-        transform.position = new(transform.position.x, yPosition, transform.position.z);
+            transform.position = new(transform.position.x, yPosition, transform.position.z);
+        }
 
         if (FlyTimer.Expired(Runner))
         {
-            Velocity = Vector3.zero;
+            Velocity = yDelta < 0 ? new Vector3(Velocity.x, yDelta / Runner.DeltaTime, Velocity.z) : Velocity;
+
             FlyTimer = CustomTickTimer.None;
-            CurrentState = (int)State.Grounded;
+
+            Debug.Log(Velocity.ToString());
         }
     }
 
@@ -135,8 +140,10 @@ public class ItemBase : NetworkBehaviour
         else
         {
             yScalar = .5f - Easings.EaseInCubic((time - .5f) * 2) / 2;
-            yPosition = (StartPositionY - groundDistanceOnThrow)
-                + (FlyHeight + groundDistanceOnThrow) * yScalar;
+
+            float groundHeight = StartPositionY - groundDistanceOnThrow;
+            //float difference = 
+            yPosition = groundHeight + (FlyHeight + groundDistanceOnThrow) * yScalar;
         }
 
         return yPosition;
@@ -165,7 +172,7 @@ public class ItemBase : NetworkBehaviour
 
     public virtual bool IsPickable()
     {
-        return CurrentState == (int)State.Grounded;
+        return CurrentState == (int)State.Default;
     }
 
 

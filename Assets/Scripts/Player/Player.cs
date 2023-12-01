@@ -103,6 +103,7 @@ public class Player : NetworkBehaviour, IBucketable
                         HeldItem.OnPickup();
                     }
                 }
+
                 else if (CurrentState == (int)State.HoldingItem)
                 {
                     HeldItem.transform.position = itemHoldTransform.position;
@@ -123,10 +124,17 @@ public class Player : NetworkBehaviour, IBucketable
     }
 
 
-    public void EquipBucket(ItemBase item)
+    public void EquipItem(ItemBase item)
     {
         CurrentState = (int)State.Bucketed;
         WornItem = item;
+    }
+
+
+    public void UnequipItem()
+    {
+        CurrentState = (int)State.Default;
+        WornItem.Throw(Vector3.zero, 0, 1, 2);
     }
 
 

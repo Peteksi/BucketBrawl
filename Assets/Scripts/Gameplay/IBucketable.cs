@@ -6,5 +6,7 @@ public interface IBucketable
 {
     public bool IsBucketable();
 
-    public void EquipBucket(ItemBase item);
+    public void EquipItem(ItemBase item);
+
+    public void UnequipItem();
 }
