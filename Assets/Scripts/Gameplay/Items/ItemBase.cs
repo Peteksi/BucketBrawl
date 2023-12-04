@@ -106,24 +106,26 @@ public class ItemBase : NetworkBehaviour
             Velocity = Vector3.Reflect(Velocity, hitInfo.GetFaceNormal(transform.forward));
             Velocity = new Vector3(Velocity.x, yOld, Velocity.z);
 
-            transform.rotation = Quaternion.LookRotation(Velocity);
+            transform.rotation = Quaternion.LookRotation(new Vector3(Velocity.x, 0, Velocity.z));
         }
-
-        float yDelta = 0;
 
         if (FlyTimer.IsRunning)
         {
             float yPosition = EvaluateThrowHeight(FlyTimer.NormalizedValue(Runner));
-            yDelta = yPosition - transform.position.y;
-
+            float yDelta = yPosition - transform.position.y;
             Velocity = new(Velocity.x, yDelta / Runner.DeltaTime, Velocity.z);
         }
 
         if (FlyTimer.Expired(Runner))
         {
-            //Velocity = yDelta < 0 ? new Vector3(Velocity.x, yDelta / Runner.DeltaTime, Velocity.z) : Velocity;
-
             FlyTimer = CustomTickTimer.None;
+        }
+
+        if (IsGrounded(out var groundHitInfo))
+        {
+            CurrentState = (int)State.Default;
+            Velocity = Vector3.zero;
+            transform.position = groundHitInfo.point + new Vector3(0, colliderHeight * .5f + colliderRadius);
         }
 
         transform.position += Velocity * Runner.DeltaTime;
@@ -137,12 +139,13 @@ public class ItemBase : NetworkBehaviour
 
         if (time < .5f)
         {
-            yScalar = Easings.EaseOutCubic(time * 2) / 2;
+            yScalar = Easings.EaseOutSine(time * 2) / 2;
             yPosition = StartPositionY + FlyHeight * yScalar;
         }
+
         else
         {
-            yScalar = .5f - Easings.EaseInCubic((time - .5f) * 2) / 2;
+            yScalar = .5f - Easings.EaseInSine((time - .5f) * 2) / 2;
 
             float groundHeight = StartPositionY - groundDistanceOnThrow;
             yPosition = groundHeight + (FlyHeight + groundDistanceOnThrow * 2) * yScalar;
@@ -180,6 +183,7 @@ public class ItemBase : NetworkBehaviour
             out var raycastHit, colliderHeight * .5f, wallLayerMask))
         {
             hitInfo = raycastHit;
+            return true;
         }
 
         return false;
