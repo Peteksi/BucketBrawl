@@ -90,32 +90,8 @@ MonoBehaviour:
   _Velocity: {x: 0, y: 0, z: 0}
   colliderRadius: 0.14
   colliderLength: 0.51
-  groundRaycastLength: 0.38
-  yMotionCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: -0.00000011920929
-      inSlope: 2.9662633
-      outSlope: 2.9662633
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.052734375
-    - serializedVersion: 3
-      time: 1
-      value: -0.652905
-      inSlope: -4.8260922
-      outSlope: -4.8260922
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.056151688
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  hitBoxRadius: 0.5
+  colliderHeight: 0.5
+  hurtboxRadius: 0.5
 --- !u!114 &5344601189045266295
 MonoBehaviour:
   m_ObjectHideFlags: 0

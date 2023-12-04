@@ -34,6 +34,8 @@ public class ItemBase : NetworkBehaviour
 
     private ChangeDetector changes;
 
+    readonly int wallLayerMask = 1 << 7;
+
     NetworkRigidbody3D RigidBody
     {
         get
@@ -54,7 +56,7 @@ public class ItemBase : NetworkBehaviour
 
     // Network methods
 
-    public virtual void Initialize(Vector3 direction, float speed, float flyTime)
+    public virtual void Initialize(Vector3 direction, float speed, float flyHeight, float flyTime)
     {
         CurrentState = speed > 0 ? (int)State.Flying : (int)State.Default;
     }
@@ -95,12 +97,10 @@ public class ItemBase : NetworkBehaviour
 
     protected virtual void MoveAndCollide()
     {
-        transform.position += Velocity * Runner.DeltaTime;
-
         var normalizedVelocity = Velocity.normalized;
 
         if (Runner.GetPhysicsScene().SphereCast(transform.position - transform.forward * (colliderLength * .5f),
-            colliderRadius, normalizedVelocity, out var hitInfo, colliderLength, LayerMask.GetMask("Wall")))
+            colliderRadius, normalizedVelocity, out var hitInfo, colliderLength, wallLayerMask))
         {
             var yOld = Velocity.y;
             Velocity = Vector3.Reflect(Velocity, hitInfo.GetFaceNormal(transform.forward));
@@ -116,17 +116,17 @@ public class ItemBase : NetworkBehaviour
             float yPosition = EvaluateThrowHeight(FlyTimer.NormalizedValue(Runner));
             yDelta = yPosition - transform.position.y;
 
-            transform.position = new(transform.position.x, yPosition, transform.position.z);
+            Velocity = new(Velocity.x, yDelta / Runner.DeltaTime, Velocity.z);
         }
 
         if (FlyTimer.Expired(Runner))
         {
-            Velocity = yDelta < 0 ? new Vector3(Velocity.x, yDelta / Runner.DeltaTime, Velocity.z) : Velocity;
+            //Velocity = yDelta < 0 ? new Vector3(Velocity.x, yDelta / Runner.DeltaTime, Velocity.z) : Velocity;
 
             FlyTimer = CustomTickTimer.None;
-
-            Debug.Log(Velocity.ToString());
         }
+
+        transform.position += Velocity * Runner.DeltaTime;
     }
 
 
@@ -145,7 +145,6 @@ public class ItemBase : NetworkBehaviour
             yScalar = .5f - Easings.EaseInCubic((time - .5f) * 2) / 2;
 
             float groundHeight = StartPositionY - groundDistanceOnThrow;
-            //float difference = 
             yPosition = groundHeight + (FlyHeight + groundDistanceOnThrow * 2) * yScalar;
         }
 
@@ -153,7 +152,7 @@ public class ItemBase : NetworkBehaviour
     }
 
 
-    public virtual void Throw(Vector3 direction, float speed, float flyTime, float flyHeight)
+    public virtual void Throw(Vector3 direction, float speed, float flyHeight, float flyTime)
     {
         CurrentState = (int)State.Flying;
 
@@ -163,13 +162,27 @@ public class ItemBase : NetworkBehaviour
 
         groundDistanceOnThrow = 0;
         if (Runner.GetPhysicsScene().Raycast(transform.position, -transform.up, out var hitInfo, colliderHeight,
-            LayerMask.GetMask("Wall")))
+            wallLayerMask))
         {
             groundDistanceOnThrow = hitInfo.distance - colliderHeight * .5f;
         }
 
         Velocity = direction * speed;
         transform.rotation = Quaternion.LookRotation(direction);
+    }
+
+
+    public virtual bool IsGrounded(out RaycastHit hitInfo)
+    {
+        hitInfo = default;
+
+        if (Runner.GetPhysicsScene().SphereCast(transform.position, colliderRadius * .95f, -transform.up,
+            out var raycastHit, colliderHeight * .5f, wallLayerMask))
+        {
+            hitInfo = raycastHit;
+        }
+
+        return false;
     }
 
 
@@ -213,9 +226,12 @@ public class ItemBase : NetworkBehaviour
     public virtual void DrawGizmos()
     {
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position - .5f * colliderLength * transform.forward, colliderRadius);
-        Gizmos.DrawWireSphere(transform.position + .5f * colliderLength * transform.forward, colliderRadius);
-        Gizmos.DrawLine(transform.position - transform.up * -colliderHeight / 2, transform.position + transform.up * -colliderHeight / 2);
+
+        CustomGizmos.DrawWireCapsule(transform.position - colliderLength * transform.forward * .5f,
+            transform.position + colliderLength * transform.forward * .5f, colliderRadius);
+
+        CustomGizmos.DrawWireCapsule(transform.position,
+            transform.position - colliderHeight * transform.up * .5f, colliderRadius * .95f);
 
         Gizmos.color = Color.white;
 

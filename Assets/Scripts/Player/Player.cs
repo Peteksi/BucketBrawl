@@ -107,8 +107,7 @@ public class Player : NetworkBehaviour, IBucketable
                 else if (CurrentState == (int)State.HoldingItem)
                 {
                     HeldItem.transform.position = itemHoldTransform.position;
-                    HeldItem.Throw(transform.forward, 20, .75f, 1.5f);
-                    //HeldItemRB.RBIsKinematic = false;
+                    HeldItem.Throw(transform.forward, 20, 1.5f, .75f);
 
                     CurrentState = (int)State.Default;
                     HeldItem = null;
@@ -134,7 +133,7 @@ public class Player : NetworkBehaviour, IBucketable
     public void UnequipItem()
     {
         CurrentState = (int)State.Default;
-        WornItem.Throw(Vector3.zero, 0, 1, 2);
+        WornItem.Throw(Vector3.zero, 0, 4, 1);
     }
 
 

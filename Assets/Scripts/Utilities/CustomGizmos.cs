@@ -22,5 +22,18 @@ namespace BucketBrawl
                 previousCircumferencePoint = newCircumferencePoint;
             }
         }
+
+        public static void DrawWireCapsule(Vector3 point1, Vector3 point2, float radius)
+        {
+            // Draw the main body of the capsule
+            Gizmos.DrawWireSphere(point1, radius);
+            Gizmos.DrawWireSphere(point2, radius);
+            Gizmos.DrawLine(point1 + Vector3.up * radius, point2 + Vector3.up * radius);
+            Gizmos.DrawLine(point1 - Vector3.up * radius, point2 - Vector3.up * radius);
+            Gizmos.DrawLine(point1 + Vector3.right * radius, point2 + Vector3.right * radius);
+            Gizmos.DrawLine(point1 - Vector3.right * radius, point2 - Vector3.right * radius);
+            Gizmos.DrawLine(point1 + Vector3.forward * radius, point2 + Vector3.forward * radius);
+            Gizmos.DrawLine(point1 - Vector3.forward * radius, point2 - Vector3.forward * radius);
+        }
     }
 }

@@ -9,7 +9,7 @@ public class Bucket : ItemBase
 
     // Local variables
 
-    [SerializeField] float hitBoxRadius;
+    [SerializeField] float hurtboxRadius;
 
     List<LagCompensatedHit> hits = new();
 
@@ -35,7 +35,7 @@ public class Bucket : ItemBase
         var inputAuthority = Object.InputAuthority;
         var hitboxManager = Runner.LagCompensation;
 
-        var count = hitboxManager.OverlapSphere(transform.position, hitBoxRadius, inputAuthority, hits,
+        var count = hitboxManager.OverlapSphere(transform.position, hurtboxRadius, inputAuthority, hits,
             layerMask: playerLayerMask);
 
         for (int i = 0; i < count; i++)
@@ -65,7 +65,7 @@ public class Bucket : ItemBase
         base.DrawGizmos();
 
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, hitBoxRadius);
+        Gizmos.DrawWireSphere(transform.position, hurtboxRadius);
         Gizmos.color = Color.white;
     }
 }

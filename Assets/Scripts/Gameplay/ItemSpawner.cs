@@ -26,7 +26,7 @@ public class ItemSpawner : NetworkBehaviour
     }
 
 
-    public void Spawn(Vector3? direction = null, float speed = 0, float flyTime = 0, float flyHeight = 0)
+    public void Spawn(Vector3? direction = null, float speed = 0, float flyHeight = 0, float flyTime = 0)
     {
         if (!Runner.IsServer) return;
 
@@ -39,7 +39,7 @@ public class ItemSpawner : NetworkBehaviour
             Object.InputAuthority,
             (runner, o) =>
             {
-                o.GetComponent<ItemBase>().Initialize((Vector3)direction, speed, flyTime);
+                o.GetComponent<ItemBase>().Initialize((Vector3)direction, speed, flyHeight, flyTime);
             }
         );
     }
