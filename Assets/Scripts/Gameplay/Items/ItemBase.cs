@@ -123,6 +123,7 @@ public class ItemBase : NetworkBehaviour
 
         if (IsGrounded(out var groundHitInfo))
         {
+            FlyTimer = CustomTickTimer.None;
             CurrentState = (int)State.Default;
             Velocity = Vector3.zero;
             transform.position = groundHitInfo.point + new Vector3(0, colliderHeight * .5f + colliderRadius);
@@ -139,13 +140,13 @@ public class ItemBase : NetworkBehaviour
 
         if (time < .5f)
         {
-            yScalar = Easings.EaseOutSine(time * 2) / 2;
+            yScalar = Easings.EaseOutQuad(time * 2) / 2;
             yPosition = StartPositionY + FlyHeight * yScalar;
         }
 
         else
         {
-            yScalar = .5f - Easings.EaseInSine((time - .5f) * 2) / 2;
+            yScalar = .5f - Easings.EaseInQuad((time - .5f) * 2) / 2;
 
             float groundHeight = StartPositionY - groundDistanceOnThrow;
             yPosition = groundHeight + (FlyHeight + groundDistanceOnThrow * 2) * yScalar;

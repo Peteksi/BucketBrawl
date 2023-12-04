@@ -22,6 +22,8 @@ public class Player : NetworkBehaviour, IBucketable
 
     [Networked] private ItemBase WornItem { get; set; }
 
+    [Networked] private CustomTickTimer UnequipTimer { get; set; }
+
     [Networked] private int CurrentState { get; set; }
 
 
