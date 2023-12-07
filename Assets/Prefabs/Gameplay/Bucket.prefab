@@ -92,6 +92,7 @@ MonoBehaviour:
   colliderLength: 0.51
   colliderHeight: 0.5
   hurtboxRadius: 0.5
+  equipDuration: 3
 --- !u!114 &5344601189045266295
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -89,7 +89,7 @@ public class Player : NetworkBehaviour, IBucketable
             var speedMultiplier = 1f;
             if (CurrentState == (int)State.Bucketed) speedMultiplier = bucketedSpeedMultiplier;
 
-            characterController.Move(Runner.DeltaTime * direction, speedMultiplier);
+            characterController.Move(direction * Runner.DeltaTime, speedMultiplier);
 
 
             // collecting & throwing buckets
@@ -125,10 +125,11 @@ public class Player : NetworkBehaviour, IBucketable
     }
 
 
-    public void EquipItem(ItemBase item)
+    public void EquipItem(ItemBase item, float duration)
     {
         CurrentState = (int)State.Bucketed;
         WornItem = item;
+        if (duration > 0) UnequipTimer = CustomTickTimer.CreateFromSeconds(Runner, duration);
     }
 
 

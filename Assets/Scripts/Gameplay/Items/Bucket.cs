@@ -10,6 +10,7 @@ public class Bucket : ItemBase
     // Local variables
 
     [SerializeField] float hurtboxRadius;
+    [SerializeField] float equipDuration;
 
     List<LagCompensatedHit> hits = new();
 
@@ -48,7 +49,7 @@ public class Bucket : ItemBase
 
                 if (Vector3.Dot(directionToOther.normalized, Velocity.normalized) > 0)
                 {
-                    bucketable.EquipItem(this);
+                    bucketable.EquipItem(this, equipDuration);
                     CurrentState = (int)State.Inactive;
                     break;
                 }
