@@ -108,12 +108,18 @@ public class Player : NetworkBehaviour, IBucketable
 
                 else if (CurrentState == (int)State.HoldingItem)
                 {
-                    HeldItem.transform.position = itemHoldTransform.position;
-                    HeldItem.Throw(transform.forward, 20, 1.5f, .75f);
-
                     CurrentState = (int)State.Default;
+
+                    ThrowItem(HeldItem, itemHoldTransform.position,
+                        new ItemBase.Params(transform.forward, 20, 1.5f, .75f));
                     HeldItem = null;
                 }
+            }
+
+            if (UnequipTimer.Expired(Runner))
+            {
+                UnequipItem();
+                UnequipTimer = CustomTickTimer.None;
             }
         }
     }
@@ -136,7 +142,16 @@ public class Player : NetworkBehaviour, IBucketable
     public void UnequipItem()
     {
         CurrentState = (int)State.Default;
-        WornItem.Throw(Vector3.zero, 0, 4, 1);
+
+        ThrowItem(WornItem, itemWearTransform.position, new ItemBase.Params(-transform.forward, 1, 4, .8f));
+        WornItem = null;
+    }
+
+
+    public void ThrowItem(ItemBase item, Vector3 from, ItemBase.Params itemParams)
+    {
+        item.transform.position = from;
+        item.Throw(itemParams);
     }
 
 

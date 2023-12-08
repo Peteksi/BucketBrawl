@@ -56,9 +56,9 @@ public class ItemBase : NetworkBehaviour
 
     // Network methods
 
-    public virtual void Initialize(Vector3 direction, float speed, float flyHeight, float flyTime)
+    public virtual void Initialize(Params itemParams)
     {
-        CurrentState = speed > 0 ? (int)State.Flying : (int)State.Default;
+        CurrentState = itemParams.Speed > 0 ? (int)State.Flying : (int)State.Default;
     }
 
 
@@ -156,13 +156,13 @@ public class ItemBase : NetworkBehaviour
     }
 
 
-    public virtual void Throw(Vector3 direction, float speed, float flyHeight, float flyTime)
+    public virtual void Throw(Params itemParams)
     {
         CurrentState = (int)State.Flying;
 
         StartPositionY = transform.position.y;
-        FlyHeight = flyHeight;
-        FlyTimer = CustomTickTimer.CreateFromSeconds(Runner, flyTime);
+        FlyHeight = itemParams.FlyHeight;
+        FlyTimer = CustomTickTimer.CreateFromSeconds(Runner, itemParams.FlyTime);
 
         groundDistanceOnThrow = 0;
         if (Runner.GetPhysicsScene().Raycast(transform.position, -transform.up, out var hitInfo, colliderHeight,
@@ -171,8 +171,8 @@ public class ItemBase : NetworkBehaviour
             groundDistanceOnThrow = hitInfo.distance - colliderHeight * .5f;
         }
 
-        Velocity = direction * speed;
-        transform.rotation = Quaternion.LookRotation(direction);
+        Velocity = itemParams.Direction * itemParams.Speed;
+        transform.rotation = Quaternion.LookRotation(itemParams.Direction);
     }
 
 
@@ -244,5 +244,22 @@ public class ItemBase : NetworkBehaviour
         style.normal.textColor = Color.cyan;
 
         if (EditorApplication.isPlaying && Object != null && Object.IsValid) Handles.Label(transform.position, ((State)CurrentState).ToString(), style);
+    }
+
+
+    public struct Params
+    {
+        public Vector3 Direction { get; }
+        public float Speed { get; }
+        public float FlyHeight { get; }
+        public float FlyTime { get; }
+
+        public Params(Vector3 direction, float speed, float flyHeight, float flyTime)
+        {
+            Direction = direction;
+            Speed = speed;
+            FlyHeight = flyHeight;
+            FlyTime = flyTime;
+        }
     }
 }
