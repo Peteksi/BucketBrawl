@@ -5,8 +5,9 @@ using UnityEditor;
 using UnityEngine;
 using BucketBrawl;
 using Fusion.Addons.Physics;
+using System;
 
-
+[SelectionBase]
 public class ItemBase : NetworkBehaviour
 {
 
@@ -246,12 +247,12 @@ public class ItemBase : NetworkBehaviour
         if (EditorApplication.isPlaying && Object != null && Object.IsValid) Handles.Label(transform.position, ((State)CurrentState).ToString(), style);
     }
 
-
+    [Serializable]
     public struct FlightParams
     {
-        public float Speed { get; }
-        public float FlyHeight { get; }
-        public float FlyTime { get; }
+        public float Speed;
+        public float FlyHeight;
+        public float FlyTime;
 
         public FlightParams(float speed, float flyHeight, float flyTime)
         {

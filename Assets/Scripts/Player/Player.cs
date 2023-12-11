@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 using Fusion.Addons.Physics;
 
 
-//[RequireComponent(typeof(CustomCharacterController), typeof(ItemSpawner))]
+[SelectionBase]
 public class Player : NetworkBehaviour, IBucketable
 {
 
@@ -31,10 +31,21 @@ public class Player : NetworkBehaviour, IBucketable
 
     [SerializeField] int localPlayerIndex;
 
+    [Header("GAMEPLAY:")]
+
     [Range(0, 1)] [SerializeField] float bucketedSpeedMultiplier;
+
+    [Header("ITEM THROW PARAMETERS:")]
+
+    [SerializeField] ItemBase.FlightParams throwFlightParams;
+    [SerializeField] ItemBase.FlightParams unequipFlightParams;
+
+    [Header("QUERY AREAS:")]
 
     [SerializeField] float itemPickupRadius;
     [SerializeField] Vector3 itemPickupRadiusOffset;
+
+    [Header("REFERENCES:")]
 
     [SerializeField] Transform itemHoldTransform;
     [SerializeField] Transform itemWearTransform;
@@ -44,15 +55,6 @@ public class Player : NetworkBehaviour, IBucketable
     List<LagCompensatedHit> itemQueryHits = new();
 
     readonly int itemLayerMask = 1 << 8;
-
-    //NetworkRigidbody3D HeldItemRB
-    //{
-    //    get
-    //    {
-    //        if (HeldItem.TryGetComponent<NetworkRigidbody3D>(out var rb)) { return rb; }
-    //        else { return null; }
-    //    }
-    //}
 
 
     enum State
@@ -110,8 +112,7 @@ public class Player : NetworkBehaviour, IBucketable
                 {
                     CurrentState = (int)State.Default;
 
-                    ThrowItem(HeldItem, itemHoldTransform.position, transform.forward,
-                        new ItemBase.FlightParams(20, 1.5f, .75f));
+                    ThrowItem(HeldItem, itemHoldTransform.position, transform.forward, throwFlightParams);
                     HeldItem = null;
                 }
             }
@@ -143,15 +144,15 @@ public class Player : NetworkBehaviour, IBucketable
     {
         CurrentState = (int)State.Default;
 
-        ThrowItem(WornItem, itemWearTransform.position, -transform.forward, new ItemBase.FlightParams(1, 4, .8f));
+        ThrowItem(WornItem, itemWearTransform.position, -transform.forward, unequipFlightParams);
         WornItem = null;
     }
 
 
-    public void ThrowItem(ItemBase item, Vector3 from, Vector3 direction, ItemBase.FlightParams itemParams)
+    public void ThrowItem(ItemBase item, Vector3 from, Vector3 direction, ItemBase.FlightParams flightParams)
     {
         item.transform.position = from;
-        item.Throw(direction, itemParams);
+        item.Throw(direction, flightParams);
     }
 
 
