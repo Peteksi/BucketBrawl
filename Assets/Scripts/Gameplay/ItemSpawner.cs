@@ -39,7 +39,7 @@ public class ItemSpawner : NetworkBehaviour
             Object.InputAuthority,
             (runner, o) =>
             {
-                o.GetComponent<ItemBase>().Initialize(new ItemBase.Params((Vector3)direction, speed, flyHeight, flyTime));
+                o.GetComponent<ItemBase>().Initialize((Vector3)direction, new ItemBase.FlightParams(speed, flyHeight, flyTime));
             }
         );
     }

@@ -56,9 +56,9 @@ public class ItemBase : NetworkBehaviour
 
     // Network methods
 
-    public virtual void Initialize(Params itemParams)
+    public virtual void Initialize(Vector3 direction, FlightParams flightParams)
     {
-        CurrentState = itemParams.Speed > 0 ? (int)State.Flying : (int)State.Default;
+        CurrentState = flightParams.Speed > 0 ? (int)State.Flying : (int)State.Default;
     }
 
 
@@ -156,13 +156,13 @@ public class ItemBase : NetworkBehaviour
     }
 
 
-    public virtual void Throw(Params itemParams)
+    public virtual void Throw(Vector3 direction, FlightParams flightParams)
     {
         CurrentState = (int)State.Flying;
 
         StartPositionY = transform.position.y;
-        FlyHeight = itemParams.FlyHeight;
-        FlyTimer = CustomTickTimer.CreateFromSeconds(Runner, itemParams.FlyTime);
+        FlyHeight = flightParams.FlyHeight;
+        FlyTimer = CustomTickTimer.CreateFromSeconds(Runner, flightParams.FlyTime);
 
         groundDistanceOnThrow = 0;
         if (Runner.GetPhysicsScene().Raycast(transform.position, -transform.up, out var hitInfo, colliderHeight,
@@ -171,8 +171,8 @@ public class ItemBase : NetworkBehaviour
             groundDistanceOnThrow = hitInfo.distance - colliderHeight * .5f;
         }
 
-        Velocity = itemParams.Direction * itemParams.Speed;
-        transform.rotation = Quaternion.LookRotation(itemParams.Direction);
+        Velocity = direction * flightParams.Speed;
+        transform.rotation = Quaternion.LookRotation(direction);
     }
 
 
@@ -247,16 +247,14 @@ public class ItemBase : NetworkBehaviour
     }
 
 
-    public struct Params
+    public struct FlightParams
     {
-        public Vector3 Direction { get; }
         public float Speed { get; }
         public float FlyHeight { get; }
         public float FlyTime { get; }
 
-        public Params(Vector3 direction, float speed, float flyHeight, float flyTime)
+        public FlightParams(float speed, float flyHeight, float flyTime)
         {
-            Direction = direction;
             Speed = speed;
             FlyHeight = flyHeight;
             FlyTime = flyTime;

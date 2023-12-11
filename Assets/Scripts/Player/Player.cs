@@ -110,8 +110,8 @@ public class Player : NetworkBehaviour, IBucketable
                 {
                     CurrentState = (int)State.Default;
 
-                    ThrowItem(HeldItem, itemHoldTransform.position,
-                        new ItemBase.Params(transform.forward, 20, 1.5f, .75f));
+                    ThrowItem(HeldItem, itemHoldTransform.position, transform.forward,
+                        new ItemBase.FlightParams(20, 1.5f, .75f));
                     HeldItem = null;
                 }
             }
@@ -143,15 +143,15 @@ public class Player : NetworkBehaviour, IBucketable
     {
         CurrentState = (int)State.Default;
 
-        ThrowItem(WornItem, itemWearTransform.position, new ItemBase.Params(-transform.forward, 1, 4, .8f));
+        ThrowItem(WornItem, itemWearTransform.position, -transform.forward, new ItemBase.FlightParams(1, 4, .8f));
         WornItem = null;
     }
 
 
-    public void ThrowItem(ItemBase item, Vector3 from, ItemBase.Params itemParams)
+    public void ThrowItem(ItemBase item, Vector3 from, Vector3 direction, ItemBase.FlightParams itemParams)
     {
         item.transform.position = from;
-        item.Throw(itemParams);
+        item.Throw(direction, itemParams);
     }
 
 
