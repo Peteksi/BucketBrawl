@@ -49,7 +49,8 @@ public class ItemBase : NetworkBehaviour
     protected enum State
     {
         Default,
-        Flying,
+        FlyingActive,
+        FlyingInactive,
         Inactive
     }
 
@@ -59,7 +60,7 @@ public class ItemBase : NetworkBehaviour
 
     public virtual void Initialize(Vector3 direction, FlightParams flightParams)
     {
-        CurrentState = flightParams.Speed > 0 ? (int)State.Flying : (int)State.Default;
+        CurrentState = flightParams.Speed > 0 ? (int)State.FlyingActive : (int)State.Default;
     }
 
 
@@ -71,7 +72,7 @@ public class ItemBase : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (CurrentState == (int)State.Flying)
+        if (CurrentState == (int)State.FlyingActive || CurrentState == (int)State.FlyingInactive)
         {
             MoveAndCollide();
         }
@@ -100,6 +101,17 @@ public class ItemBase : NetworkBehaviour
     {
         var normalizedVelocity = Velocity.normalized;
 
+        // Calculate y velocity
+        if (FlyTimer.IsRunning)
+        {
+            float yNew = EvaluateThrowHeight(FlyTimer.NormalizedValue(Runner));
+            float yDelta = yNew - transform.position.y;
+            Velocity = new(Velocity.x, yDelta / Runner.DeltaTime, Velocity.z);
+        }
+
+        if (FlyTimer.Expired(Runner)) FlyTimer = CustomTickTimer.None;
+
+        // Query for walls
         if (Runner.GetPhysicsScene().SphereCast(transform.position - transform.forward * (colliderLength * .5f),
             colliderRadius, normalizedVelocity, out var hitInfo, colliderLength, wallLayerMask))
         {
@@ -110,18 +122,7 @@ public class ItemBase : NetworkBehaviour
             transform.rotation = Quaternion.LookRotation(new Vector3(Velocity.x, 0, Velocity.z));
         }
 
-        if (FlyTimer.IsRunning)
-        {
-            float yPosition = EvaluateThrowHeight(FlyTimer.NormalizedValue(Runner));
-            float yDelta = yPosition - transform.position.y;
-            Velocity = new(Velocity.x, yDelta / Runner.DeltaTime, Velocity.z);
-        }
-
-        if (FlyTimer.Expired(Runner))
-        {
-            FlyTimer = CustomTickTimer.None;
-        }
-
+        // Query for ground
         if (IsGrounded(out var groundHitInfo))
         {
             FlyTimer = CustomTickTimer.None;
@@ -159,12 +160,13 @@ public class ItemBase : NetworkBehaviour
 
     public virtual void Throw(Vector3 direction, FlightParams flightParams)
     {
-        CurrentState = (int)State.Flying;
+        CurrentState = flightParams.IsActive ? (int)State.FlyingActive : (int)State.FlyingInactive;
 
         StartPositionY = transform.position.y;
         FlyHeight = flightParams.FlyHeight;
         FlyTimer = CustomTickTimer.CreateFromSeconds(Runner, flightParams.FlyTime);
 
+        // Determine where the item will land
         groundDistanceOnThrow = 0;
         if (Runner.GetPhysicsScene().Raycast(transform.position, -transform.up, out var hitInfo, colliderHeight,
             wallLayerMask))
@@ -181,8 +183,8 @@ public class ItemBase : NetworkBehaviour
     {
         hitInfo = default;
 
-        if (Runner.GetPhysicsScene().SphereCast(transform.position, colliderRadius * .95f, -transform.up,
-            out var raycastHit, colliderHeight * .5f, wallLayerMask))
+        if (Velocity.y < 0 && Runner.GetPhysicsScene().SphereCast(transform.position, colliderRadius * .95f,
+            -transform.up, out var raycastHit, colliderHeight * .5f, wallLayerMask))
         {
             hitInfo = raycastHit;
             return true;
@@ -247,18 +249,21 @@ public class ItemBase : NetworkBehaviour
         if (EditorApplication.isPlaying && Object != null && Object.IsValid) Handles.Label(transform.position, ((State)CurrentState).ToString(), style);
     }
 
+
     [Serializable]
     public struct FlightParams
     {
         public float Speed;
         public float FlyHeight;
         public float FlyTime;
+        public bool IsActive;
 
-        public FlightParams(float speed, float flyHeight, float flyTime)
+        public FlightParams(float speed, float flyHeight, float flyTime, bool isActive)
         {
             Speed = speed;
             FlyHeight = flyHeight;
             FlyTime = flyTime;
+            IsActive = isActive;
         }
     }
 }
