@@ -24,7 +24,7 @@ public class Bucket : ItemBase
     {
         base.FixedUpdateNetwork();
 
-        if (CurrentState == (int)State.FlyingActive)
+        if (CurrentState == (int)State.Flying)
         {
             HitboxQuery();
         }

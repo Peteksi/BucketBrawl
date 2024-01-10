@@ -10,8 +10,6 @@ public class ItemSpawner : NetworkBehaviour
 {
     [SerializeField] NetworkPrefabRef itemPrefab;
 
-    [SerializeField] float zOffset;
-
     [SerializeField] bool spawnOnStart = false;
 
     public void SetPrefab(NetworkPrefabRef prefab)
@@ -34,7 +32,7 @@ public class ItemSpawner : NetworkBehaviour
 
         Runner.Spawn(
             itemPrefab,
-            transform.position + transform.forward * zOffset,
+            transform.position,
             Quaternion.LookRotation((Vector3)direction),
             Object.InputAuthority,
             (runner, o) =>
@@ -49,8 +47,8 @@ public class ItemSpawner : NetworkBehaviour
     {
         Gizmos.color = new(0, 1, 1, .5f);
 
-        Gizmos.DrawSphere(transform.position + transform.forward * zOffset, .075f);
-        CustomGizmos.DrawCircle(transform.position + transform.forward * zOffset, transform.up, .5f);
+        Gizmos.DrawSphere(transform.position, .075f);
+        CustomGizmos.DrawCircle(transform.position, transform.up, .5f);
         Gizmos.color = Color.white;
     }
 }

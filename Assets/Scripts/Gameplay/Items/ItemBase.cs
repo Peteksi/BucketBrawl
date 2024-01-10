@@ -49,7 +49,7 @@ public class ItemBase : NetworkBehaviour
     protected enum State
     {
         Default,
-        FlyingActive,
+        Flying,
         FlyingInactive,
         Inactive
     }
@@ -60,7 +60,7 @@ public class ItemBase : NetworkBehaviour
 
     public virtual void Initialize(Vector3 direction, FlightParams flightParams)
     {
-        CurrentState = flightParams.Speed > 0 ? (int)State.FlyingActive : (int)State.Default;
+        CurrentState = flightParams.Speed > 0 ? (int)State.Flying : (int)State.Default;
     }
 
 
@@ -72,7 +72,7 @@ public class ItemBase : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (CurrentState == (int)State.FlyingActive || CurrentState == (int)State.FlyingInactive)
+        if (CurrentState == (int)State.Flying || CurrentState == (int)State.FlyingInactive)
         {
             MoveAndCollide();
         }
@@ -160,7 +160,7 @@ public class ItemBase : NetworkBehaviour
 
     public virtual void Throw(Vector3 direction, FlightParams flightParams)
     {
-        CurrentState = flightParams.IsActive ? (int)State.FlyingActive : (int)State.FlyingInactive;
+        CurrentState = flightParams.IsActive ? (int)State.Flying : (int)State.FlyingInactive;
 
         StartPositionY = transform.position.y;
         FlyHeight = flightParams.FlyHeight;

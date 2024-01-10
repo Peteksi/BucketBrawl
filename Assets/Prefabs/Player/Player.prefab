@@ -756,12 +756,17 @@ MonoBehaviour:
     Speed: 20
     FlyHeight: 1.5
     FlyTime: 0.75
-    Active: 1
+    IsActive: 1
   unequipFlightParams:
-    Speed: 1
+    Speed: 1.5
     FlyHeight: 4
     FlyTime: 0.8
-    Active: 1
+    IsActive: 1
+  dropFlightParams:
+    Speed: 1
+    FlyHeight: 0.15
+    FlyTime: 0.15
+    IsActive: 0
   itemPickupRadius: 1.62
   itemPickupRadiusOffset: {x: 0, y: -0.29, z: 0}
   itemHoldTransform: {fileID: 3711507907113741568}

@@ -39,6 +39,7 @@ public class Player : NetworkBehaviour, IBucketable
 
     [SerializeField] ItemBase.FlightParams throwFlightParams;
     [SerializeField] ItemBase.FlightParams unequipFlightParams;
+    [SerializeField] ItemBase.FlightParams dropFlightParams;
 
     [Header("QUERY AREAS:")]
 
@@ -83,7 +84,7 @@ public class Player : NetworkBehaviour, IBucketable
             PreviousButtons = inputData.Buttons;
 
 
-            // movement
+            // Movement
 
             var direction = new Vector3(inputData.Direction.x, 0, inputData.Direction.y);
             direction.Normalize();
@@ -94,10 +95,11 @@ public class Player : NetworkBehaviour, IBucketable
             characterController.Move(direction * Runner.DeltaTime, speedMultiplier);
 
 
-            // collecting & throwing buckets
+            // Handle input
 
             if (pressedButtons.IsSet(NetworkInputButtons.Action))
             {
+                // Default -> Query for items
                 if (CurrentState == (int)State.Default)
                 {
                     HeldItem = ItemQuery();
@@ -108,12 +110,19 @@ public class Player : NetworkBehaviour, IBucketable
                     }
                 }
 
+                // Holding an item -> Throw it
                 else if (CurrentState == (int)State.HoldingItem)
                 {
                     CurrentState = (int)State.Default;
 
                     ThrowItem(HeldItem, itemHoldTransform.position, transform.forward, throwFlightParams);
                     HeldItem = null;
+                }
+
+                // Bucketed -> Shorten timer
+                else if (CurrentState == (int)State.Bucketed)
+                {
+
                 }
             }
 
@@ -137,6 +146,12 @@ public class Player : NetworkBehaviour, IBucketable
         CurrentState = (int)State.Bucketed;
         WornItem = item;
         if (duration > 0) UnequipTimer = CustomTickTimer.CreateFromSeconds(Runner, duration);
+
+        if (HeldItem)
+        {
+            ThrowItem(HeldItem, itemHoldTransform.position, transform.forward, dropFlightParams);
+            HeldItem = null;
+        }
     }
 
 
@@ -231,6 +246,9 @@ public class Player : NetworkBehaviour, IBucketable
 
         if (EditorApplication.isPlaying && Object != null && Object.IsValid && HeldItem != null)
             Gizmos.DrawLine(transform.position, HeldItem.transform.position);
+
+        if (EditorApplication.isPlaying && Object != null && Object.IsValid && WornItem != null)
+            Gizmos.DrawLine(transform.position, WornItem.transform.position);
 
         Gizmos.color = Color.white;
 

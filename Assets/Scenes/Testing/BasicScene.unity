@@ -3679,7 +3679,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemPrefab:
     RawGuidValue: 20cca059707553d47abf2ac5eb7a0b00
-  zOffset: 0
+  offset: {x: 0, y: 0, z: 0}
   spawnOnStart: 1
 --- !u!1001 &508285984
 PrefabInstance:
@@ -6174,13 +6174,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 871108489}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0.1371211, z: -0, w: 0.9905543}
   m_LocalPosition: {x: 0, y: -1.338, z: -4.844}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 85451752}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -15.763, z: 0}
 --- !u!114 &871108491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6215,7 +6215,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemPrefab:
     RawGuidValue: add0d56792bbbd54e9dd5dc4fe53d91f
-  zOffset: 0
+  offset: {x: -0.7438102, y: 0, z: -1.4391509}
   spawnOnStart: 1
 --- !u!1 &899838447
 GameObject:
