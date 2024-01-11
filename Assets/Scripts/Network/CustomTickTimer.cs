@@ -5,7 +5,6 @@ public struct CustomTickTimer : INetworkStruct
 {
     public static CustomTickTimer None => default;
     
-
     public readonly bool Expired(NetworkRunner runner) => runner.IsRunning && _target > 0
       && (Tick)_target <= runner.Tick;
 
