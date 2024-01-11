@@ -10,7 +10,6 @@ public struct CustomTickTimer : INetworkStruct
 
     public readonly bool IsRunning => _target > 0;
 
-        
     private int _target;
     private int _initialTick;
 
@@ -40,11 +39,9 @@ public struct CustomTickTimer : INetworkStruct
 
     public float NormalizedValue(NetworkRunner runner)
     {
-        if (runner == null || runner.IsRunning == false || IsRunning == false)
-            return 0;
+        if (runner == null || runner.IsRunning == false || IsRunning == false) return 0;
 
-        if (Expired(runner))
-            return 1;
+        if (Expired(runner)) return 1;
 
         return ElapsedTicks(runner) / (_target - (float)_initialTick);
     }
@@ -54,6 +51,8 @@ public struct CustomTickTimer : INetworkStruct
     {
         if (!IsRunnerAndTimerRunning(runner)) return 0;
 
+        if (Expired(runner)) return _target - _initialTick; // max value
+
         return runner.Tick - _initialTick;
     }
 
@@ -62,13 +61,15 @@ public struct CustomTickTimer : INetworkStruct
     {
         if (!IsRunnerAndTimerRunning(runner)) return 0;
 
+        if (Expired(runner)) return (_target - _initialTick) * runner.DeltaTime; // max value
+
         return (runner.Tick - _initialTick) * runner.DeltaTime;
     }
 
 
     public int RemainingTicks(NetworkRunner runner)
     {
-        if (!IsRunnerAndTimerRunning(runner)) return 0;
+        if (!IsRunnerAndTimerRunning(runner) || Expired(runner)) return 0;
 
         return _target - runner.Tick;
     }
@@ -76,7 +77,7 @@ public struct CustomTickTimer : INetworkStruct
 
     public float RemainingSeconds(NetworkRunner runner)
     {
-        if (!IsRunnerAndTimerRunning(runner)) return 0;
+        if (!IsRunnerAndTimerRunning(runner) || Expired(runner)) return 0;
 
         return (_target - runner.Tick) * runner.DeltaTime;
     }
@@ -84,7 +85,7 @@ public struct CustomTickTimer : INetworkStruct
 
     private bool IsRunnerAndTimerRunning(NetworkRunner runner)
     {
-        if (runner == false || runner.IsRunning == false || IsRunning == false || Expired(runner))
+        if (runner == false || runner.IsRunning == false || IsRunning == false)
         {
             return false;
         }
