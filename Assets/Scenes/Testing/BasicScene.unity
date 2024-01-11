@@ -3679,7 +3679,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemPrefab:
     RawGuidValue: 20cca059707553d47abf2ac5eb7a0b00
-  offset: {x: 0, y: 0, z: 0}
   spawnOnStart: 1
 --- !u!1001 &508285984
 PrefabInstance:
@@ -6215,7 +6214,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemPrefab:
     RawGuidValue: add0d56792bbbd54e9dd5dc4fe53d91f
-  offset: {x: -0.7438102, y: 0, z: -1.4391509}
   spawnOnStart: 1
 --- !u!1 &899838447
 GameObject:

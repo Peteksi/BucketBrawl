@@ -6,10 +6,10 @@ public struct CustomTickTimer : INetworkStruct
     public static CustomTickTimer None => default;
     
 
-    public bool Expired(NetworkRunner runner) => runner.IsRunning && _target > 0
+    public readonly bool Expired(NetworkRunner runner) => runner.IsRunning && _target > 0
       && (Tick)_target <= runner.Tick;
 
-    public bool IsRunning => _target > 0;
+    public readonly bool IsRunning => _target > 0;
 
         
     private int _target;
@@ -53,12 +53,43 @@ public struct CustomTickTimer : INetworkStruct
 
     public int ElapsedTicks(NetworkRunner runner)
     {
-        if (runner == false || runner.IsRunning == false)
-            return 0;
-
-        if (IsRunning == false || Expired(runner))
-            return 0;
+        if (!IsRunnerAndTimerRunning(runner)) return 0;
 
         return runner.Tick - _initialTick;
+    }
+
+
+    public float ElapsedSeconds(NetworkRunner runner)
+    {
+        if (!IsRunnerAndTimerRunning(runner)) return 0;
+
+        return (runner.Tick - _initialTick) * runner.DeltaTime;
+    }
+
+
+    public int RemainingTicks(NetworkRunner runner)
+    {
+        if (!IsRunnerAndTimerRunning(runner)) return 0;
+
+        return _target - runner.Tick;
+    }
+
+
+    public float RemainingSeconds(NetworkRunner runner)
+    {
+        if (!IsRunnerAndTimerRunning(runner)) return 0;
+
+        return (_target - runner.Tick) * runner.DeltaTime;
+    }
+
+
+    private bool IsRunnerAndTimerRunning(NetworkRunner runner)
+    {
+        if (runner == false || runner.IsRunning == false || IsRunning == false || Expired(runner))
+        {
+            return false;
+        }
+
+        return true;
     }
 }

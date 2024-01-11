@@ -752,8 +752,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localPlayerIndex: 0
   bucketedSpeedMultiplier: 0.244
+  unequipTimerSkip: 0.1
   throwFlightParams:
-    Speed: 20
+    Speed: 17
     FlyHeight: 1.5
     FlyTime: 0.75
     IsActive: 1

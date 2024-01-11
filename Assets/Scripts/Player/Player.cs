@@ -34,6 +34,7 @@ public class Player : NetworkBehaviour, IBucketable
     [Header("GAMEPLAY:")]
 
     [Range(0, 1)] [SerializeField] float bucketedSpeedMultiplier;
+    [SerializeField] float unequipTimerSkip;
 
     [Header("ITEM THROW PARAMETERS:")]
 
@@ -122,7 +123,12 @@ public class Player : NetworkBehaviour, IBucketable
                 // Bucketed -> Shorten timer
                 else if (CurrentState == (int)State.Bucketed)
                 {
+                    float remainingTime = UnequipTimer.RemainingSeconds(Runner) - unequipTimerSkip;
 
+                    if (remainingTime > 0)
+                    {
+                        UnequipTimer = CustomTickTimer.CreateFromSeconds(Runner, remainingTime);
+                    }
                 }
             }
 
