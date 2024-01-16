@@ -4,7 +4,7 @@ using UnityEngine;
 public struct CustomTickTimer : INetworkStruct
 {
     public static CustomTickTimer None => default;
-    
+
     public readonly bool Expired(NetworkRunner runner) => runner.IsRunning && _target > 0
       && (Tick)_target <= runner.Tick;
 
@@ -24,6 +24,7 @@ public struct CustomTickTimer : INetworkStruct
             _target = (int)runner.Tick + ticks,
             _initialTick = runner.Tick
         };
+
         return fromTicks;
     }
 
@@ -85,6 +86,8 @@ public struct CustomTickTimer : INetworkStruct
 
     private bool IsRunnerAndTimerRunning(NetworkRunner runner)
     {
+        // if you don't eat your meat, you can't have any pudding!
+        // how can you have any pudding if you don't eat your meat?
         if (runner == false || runner.IsRunning == false || IsRunning == false)
         {
             return false;

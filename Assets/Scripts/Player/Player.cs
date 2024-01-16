@@ -47,6 +47,9 @@ public class Player : NetworkBehaviour, IBucketable
     [SerializeField] float itemPickupRadius;
     [SerializeField] Vector3 itemPickupRadiusOffset;
 
+    [SerializeField] float playerPushRadius;
+    [SerializeField] Vector3 playerPushRadiusOffset;
+
     [Header("REFERENCES:")]
 
     [SerializeField] Transform itemHoldTransform;
@@ -55,8 +58,10 @@ public class Player : NetworkBehaviour, IBucketable
     CustomCharacterController characterController;
 
     List<LagCompensatedHit> itemQueryHits = new();
+    List<LagCompensatedHit> pushQueryHits = new();
 
     readonly int itemLayerMask = 1 << 8;
+    readonly int playerLayerMask = 1 << 6;
 
 
     enum State
@@ -111,7 +116,7 @@ public class Player : NetworkBehaviour, IBucketable
                     }
                 }
 
-                // Holding an item -> Throw it
+                // Holding item -> Throw it
                 else if (CurrentState == (int)State.HoldingItem)
                 {
                     CurrentState = (int)State.Default;
@@ -131,11 +136,36 @@ public class Player : NetworkBehaviour, IBucketable
                     }
                 }
             }
+        }
 
-            if (UnequipTimer.Expired(Runner))
+
+        if (UnequipTimer.Expired(Runner))
+        {
+            UnequipItem();
+            UnequipTimer = CustomTickTimer.None;
+        }
+
+
+        if (CurrentState != (int)State.Bucketed)
+        {
+            // Query for players to push
+
+            var inputAuthority = Object.InputAuthority;
+            var hitboxManager = Runner.LagCompensation;
+
+            var queryPosition = transform.position += playerPushRadiusOffset;
+
+            var count = hitboxManager.OverlapSphere(queryPosition, playerPushRadius, inputAuthority,
+                pushQueryHits, layerMask: itemLayerMask);
+
+            for (int i = 0; i < count; i++)
             {
-                UnequipItem();
-                UnequipTimer = CustomTickTimer.None;
+                var other = pushQueryHits[i].GameObject;
+
+                if (other != null && other.TryGetComponent(out Player player))
+                {
+
+                }
             }
         }
     }
@@ -182,8 +212,7 @@ public class Player : NetworkBehaviour, IBucketable
         var inputAuthority = Object.InputAuthority;
         var hitboxManager = Runner.LagCompensation;
 
-        var queryPosition = transform.position;
-        queryPosition.y += itemPickupRadiusOffset.y;
+        var queryPosition = transform.position += itemPickupRadiusOffset;
 
         var count = hitboxManager.OverlapSphere(queryPosition, itemPickupRadius, inputAuthority,
             itemQueryHits, layerMask: itemLayerMask);
