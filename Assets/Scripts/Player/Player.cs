@@ -8,6 +8,7 @@ using UnityEngine;
 using BucketBrawl;
 using UnityEngine.UIElements;
 using Fusion.Addons.Physics;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 
 [SelectionBase]
@@ -153,7 +154,7 @@ public class Player : NetworkBehaviour, IBucketable
             var inputAuthority = Object.InputAuthority;
             var hitboxManager = Runner.LagCompensation;
 
-            var queryPosition = transform.position += playerPushRadiusOffset;
+            var queryPosition = transform.position + playerPushRadiusOffset;
 
             var count = hitboxManager.OverlapSphere(queryPosition, playerPushRadius, inputAuthority,
                 pushQueryHits, layerMask: playerLayerMask);
@@ -162,10 +163,9 @@ public class Player : NetworkBehaviour, IBucketable
             {
                 var other = pushQueryHits[i].GameObject;
 
-                if (other != null && other.TryGetComponent(out Player player))
+                if (other != null && other.TryGetComponent(out Player player) && player != this)
                 {
                     Debug.Log("a");
-                    if (player == this) Debug.Log("b");
                 }
             }
         }
@@ -213,7 +213,7 @@ public class Player : NetworkBehaviour, IBucketable
         var inputAuthority = Object.InputAuthority;
         var hitboxManager = Runner.LagCompensation;
 
-        var queryPosition = transform.position += itemPickupRadiusOffset;
+        var queryPosition = transform.position + itemPickupRadiusOffset;
 
         var count = hitboxManager.OverlapSphere(queryPosition, itemPickupRadius, inputAuthority,
             itemQueryHits, layerMask: itemLayerMask);
@@ -275,16 +275,18 @@ public class Player : NetworkBehaviour, IBucketable
 
     private void OnDrawGizmos()
     {
-        var queryPosition = transform.position + itemPickupRadiusOffset;
-
         Gizmos.color = new(1, 1, 1, .1f);
-        CustomGizmos.DrawCircle(queryPosition, transform.up, itemPickupRadius);
+        CustomGizmos.DrawCircle(transform.position + itemPickupRadiusOffset, transform.up, itemPickupRadius);
 
         if (EditorApplication.isPlaying && Object != null && Object.IsValid && HeldItem != null)
             Gizmos.DrawLine(transform.position, HeldItem.transform.position);
 
         if (EditorApplication.isPlaying && Object != null && Object.IsValid && WornItem != null)
             Gizmos.DrawLine(transform.position, WornItem.transform.position);
+
+        Gizmos.color = new(1, 0, 0, .1f);
+
+        CustomGizmos.DrawCircle(transform.position + playerPushRadiusOffset, transform.up, playerPushRadius);
 
         Gizmos.color = Color.white;
 
