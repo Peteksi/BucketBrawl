@@ -156,7 +156,7 @@ public class Player : NetworkBehaviour, IBucketable
             var queryPosition = transform.position += playerPushRadiusOffset;
 
             var count = hitboxManager.OverlapSphere(queryPosition, playerPushRadius, inputAuthority,
-                pushQueryHits, layerMask: itemLayerMask);
+                pushQueryHits, layerMask: playerLayerMask);
 
             for (int i = 0; i < count; i++)
             {
@@ -164,7 +164,8 @@ public class Player : NetworkBehaviour, IBucketable
 
                 if (other != null && other.TryGetComponent(out Player player))
                 {
-
+                    Debug.Log("a");
+                    if (player == this) Debug.Log("b");
                 }
             }
         }
