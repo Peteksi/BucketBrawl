@@ -27,6 +27,8 @@ public class Player : NetworkBehaviour, IBucketable
 
     [Networked] private int CurrentState { get; set; }
 
+    [Networked] private Vector3Compressed ExternalForces { get; set; }
+
 
     // Local variables
 
