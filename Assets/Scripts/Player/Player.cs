@@ -12,7 +12,7 @@ using static UnityEditor.Experimental.GraphView.GraphView;
 
 
 [SelectionBase]
-public class Player : NetworkBehaviour, IBucketable
+public class Player : NetworkBehaviour, IBucketable, IPushable
 {
 
     // Networked variables
@@ -27,7 +27,7 @@ public class Player : NetworkBehaviour, IBucketable
 
     [Networked] private int CurrentState { get; set; }
 
-    [Networked] private Vector3Compressed ExternalForces { get; set; }
+    [Networked] private Vector3Compressed ExternalVelocity { get; set; }
 
 
     // Local variables
@@ -38,6 +38,7 @@ public class Player : NetworkBehaviour, IBucketable
 
     [Range(0, 1)] [SerializeField] float bucketedSpeedMultiplier;
     [SerializeField] float unequipTimerSkip;
+    [SerializeField] float pushAmount;
 
     [Header("ITEM THROW PARAMETERS:")]
 
@@ -86,26 +87,19 @@ public class Player : NetworkBehaviour, IBucketable
 
     public override void FixedUpdateNetwork()
     {
+        var inputDirection = Vector3.zero;
+
         if (GetInput(out NetworkInputData combinedInputData))
         {
             var inputData = combinedInputData[localPlayerIndex];
             var pressedButtons = inputData.Buttons.GetPressed(PreviousButtons);
             PreviousButtons = inputData.Buttons;
 
+            // Collect directional input
+            inputDirection = new(inputData.Direction.x, 0, inputData.Direction.y);
+            inputDirection.Normalize();
 
-            // Movement
-
-            var direction = new Vector3(inputData.Direction.x, 0, inputData.Direction.y);
-            direction.Normalize();
-
-            var speedMultiplier = 1f;
-            if (CurrentState == (int)State.Bucketed) speedMultiplier = bucketedSpeedMultiplier;
-
-            characterController.Move(direction * Runner.DeltaTime, speedMultiplier);
-
-
-            // Handle input
-
+            // Handle button input
             if (pressedButtons.IsSet(NetworkInputButtons.Action))
             {
                 // Default -> Query for items
@@ -141,6 +135,12 @@ public class Player : NetworkBehaviour, IBucketable
             }
         }
 
+        // M
+        var speedMultiplier = 1f;
+        if (CurrentState == (int)State.Bucketed) speedMultiplier = bucketedSpeedMultiplier;
+
+        characterController.Move(inputDirection * Runner.DeltaTime, speedMultiplier);
+
 
         if (UnequipTimer.Expired(Runner))
         {
@@ -165,8 +165,10 @@ public class Player : NetworkBehaviour, IBucketable
             {
                 var other = pushQueryHits[i].GameObject;
 
-                if (other != null && other.TryGetComponent(out Player player) && player != this)
+                if (other != null)
                 {
+                    if (other.TryGetComponent(out Player player) && player == this) return;
+
                     Debug.Log("a");
                 }
             }
@@ -177,6 +179,12 @@ public class Player : NetworkBehaviour, IBucketable
     public bool IsBucketable()
     {
         return CurrentState != (int)State.Bucketed;
+    }
+
+
+    public bool IsPushable()
+    {
+        return CurrentState == (int)State.Bucketed;
     }
 
 
@@ -207,6 +215,12 @@ public class Player : NetworkBehaviour, IBucketable
     {
         item.transform.position = from;
         item.Throw(direction, flightParams);
+    }
+
+
+    public void SetPushVelocity(Vector3 direction, float scalar)
+    {
+        ExternalVelocity = direction.normalized * pushAmount * scalar;
     }
 
 
