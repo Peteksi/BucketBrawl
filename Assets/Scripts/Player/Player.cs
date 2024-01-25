@@ -27,7 +27,7 @@ public class Player : NetworkBehaviour, IBucketable, IPushable
 
     [Networked] private int CurrentState { get; set; }
 
-    [Networked] private Vector3Compressed ExternalVelocity { get; set; }
+    [Networked] private Vector3 ExternalVelocity { get; set; }
 
 
     // Local variables
@@ -135,12 +135,12 @@ public class Player : NetworkBehaviour, IBucketable, IPushable
             }
         }
 
-        // M
+        // Movement
         var speedMultiplier = 1f;
         if (CurrentState == (int)State.Bucketed) speedMultiplier = bucketedSpeedMultiplier;
 
-        characterController.Move(inputDirection * Runner.DeltaTime, speedMultiplier);
-
+        characterController.Walk(inputDirection * Runner.DeltaTime, speedMultiplier);
+        characterController.MoveUnclamped(ExternalVelocity * Runner.DeltaTime);
 
         if (UnequipTimer.Expired(Runner))
         {
@@ -167,9 +167,12 @@ public class Player : NetworkBehaviour, IBucketable, IPushable
 
                 if (other != null)
                 {
-                    if (other.TryGetComponent(out Player player) && player == this) return;
+                    //if (other.TryGetComponent(out Player player) && player == this) return;
 
-                    Debug.Log("a");
+                    if (other.TryGetComponent(out IPushable pushable) && pushable.IsPushable())
+                    {
+                        pushable.SetPushVelocity(other.transform.position - transform.position, 1);
+                    }
                 }
             }
         }
@@ -271,7 +274,7 @@ public class Player : NetworkBehaviour, IBucketable, IPushable
 
     private void Awake()
     {
-        characterController = GetComponent<CustomCharacterController>();
+        TryGetComponent(out characterController);
     }
 
 

@@ -89,7 +89,7 @@ namespace BucketBrawl
         }
 
 
-        public void Move(Vector3 direction, float scalar = 1)
+        public void Walk(Vector3 direction, float maxSpeedScalar = 1)
         {
             var deltaTime = Runner.DeltaTime;
             var previousPos = transform.position;
@@ -115,10 +115,36 @@ namespace BucketBrawl
             else
             {
                 horizontalVel = Vector3.ClampMagnitude(
-                    horizontalVel + direction * acceleration * deltaTime, maxSpeed * scalar);
+                    horizontalVel + direction * acceleration * deltaTime, maxSpeed * maxSpeedScalar);
                 transform.rotation = Quaternion.Slerp(
                     transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Runner.DeltaTime);
             }
+
+            moveVelocity.x = horizontalVel.x;
+            moveVelocity.z = horizontalVel.z;
+
+            _controller.Move(moveVelocity * deltaTime);
+
+            Data.Velocity = (transform.position - previousPos) * Runner.TickRate;
+            Data.Grounded = _controller.isGrounded;
+        }
+
+        public void MoveUnclamped(Vector3 delta)
+        {
+            var deltaTime = Runner.DeltaTime;
+            var previousPos = transform.position;
+            var moveVelocity = Data.Velocity;
+
+            delta = delta.normalized;
+
+            if (Data.Grounded && moveVelocity.y < 0)
+            {
+                moveVelocity.y = 0f;
+            }
+
+            var horizontalVel = default(Vector3);
+
+            horizontalVel += delta * deltaTime;
 
             moveVelocity.x = horizontalVel.x;
             moveVelocity.z = horizontalVel.z;
