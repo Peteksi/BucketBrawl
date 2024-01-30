@@ -753,7 +753,8 @@ MonoBehaviour:
   localPlayerIndex: 0
   bucketedSpeedMultiplier: 0.244
   unequipTimerSkip: 0.1
-  pushAmount: 2
+  pushAmount: 16
+  externalVelocityDamping: 5
   throwFlightParams:
     Speed: 17
     FlyHeight: 1.5

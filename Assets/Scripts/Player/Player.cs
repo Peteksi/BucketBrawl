@@ -8,7 +8,6 @@ using UnityEngine;
 using BucketBrawl;
 using UnityEngine.UIElements;
 using Fusion.Addons.Physics;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 
 [SelectionBase]
@@ -39,6 +38,7 @@ public class Player : NetworkBehaviour, IBucketable, IPushable
     [Range(0, 1)] [SerializeField] float bucketedSpeedMultiplier;
     [SerializeField] float unequipTimerSkip;
     [SerializeField] float pushAmount;
+    [SerializeField] float externalVelocityDamping;
 
     [Header("ITEM THROW PARAMETERS:")]
 
@@ -136,11 +136,17 @@ public class Player : NetworkBehaviour, IBucketable, IPushable
         }
 
         // Movement
-        var speedMultiplier = 1f;
-        if (CurrentState == (int)State.Bucketed) speedMultiplier = bucketedSpeedMultiplier;
+        var speedMultiplier = CurrentState == (int)State.Bucketed ? bucketedSpeedMultiplier : 1f;
+        characterController.Move(inputDirection * Runner.DeltaTime, speedMultiplier, ExternalVelocity);
 
-        characterController.Walk(inputDirection * Runner.DeltaTime, speedMultiplier);
-        characterController.MoveUnclamped(ExternalVelocity * Runner.DeltaTime);
+
+        if (ExternalVelocity != Vector3.zero)
+        {
+            ExternalVelocity = Vector3.Lerp(ExternalVelocity, default, externalVelocityDamping * Runner.DeltaTime);
+
+            if (Vector3.Distance(ExternalVelocity, Vector3.zero) < .01f) ExternalVelocity = Vector3.zero;
+        }
+
 
         if (UnequipTimer.Expired(Runner))
         {
@@ -171,7 +177,7 @@ public class Player : NetworkBehaviour, IBucketable, IPushable
 
                     if (other.TryGetComponent(out IPushable pushable) && pushable.IsPushable())
                     {
-                        pushable.SetPushVelocity(other.transform.position - transform.position, 1);
+                        pushable.SetPushVelocity(other.transform.position - Object.transform.position, 1);
                     }
                 }
             }
@@ -187,7 +193,7 @@ public class Player : NetworkBehaviour, IBucketable, IPushable
 
     public bool IsPushable()
     {
-        return CurrentState == (int)State.Bucketed;
+        return CurrentState == (int)State.Bucketed && ExternalVelocity == Vector3.zero;
     }
 
 
@@ -224,6 +230,7 @@ public class Player : NetworkBehaviour, IBucketable, IPushable
     public void SetPushVelocity(Vector3 direction, float scalar)
     {
         ExternalVelocity = direction.normalized * pushAmount * scalar;
+        Debug.Log(ExternalVelocity.ToString());
     }
 
 
@@ -291,7 +298,7 @@ public class Player : NetworkBehaviour, IBucketable, IPushable
         }
     }
 
-
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Gizmos.color = new(1, 1, 1, .1f);
@@ -315,4 +322,5 @@ public class Player : NetworkBehaviour, IBucketable, IPushable
         if (EditorApplication.isPlaying && Object != null && Object.IsValid)
             Handles.Label(transform.position, ((State)CurrentState).ToString(), style);
     }
+#endif
 }

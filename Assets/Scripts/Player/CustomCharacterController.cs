@@ -89,8 +89,10 @@ namespace BucketBrawl
         }
 
 
-        public void Walk(Vector3 direction, float maxSpeedScalar = 1)
+        public void Move(Vector3 direction, float maxSpeedScalar = 1, Vector3? externalVelocity = null)
         {
+            externalVelocity ??= Vector3.zero;
+
             var deltaTime = Runner.DeltaTime;
             var previousPos = transform.position;
             var moveVelocity = Data.Velocity;
@@ -123,7 +125,7 @@ namespace BucketBrawl
             moveVelocity.x = horizontalVel.x;
             moveVelocity.z = horizontalVel.z;
 
-            _controller.Move(moveVelocity * deltaTime);
+            _controller.Move((moveVelocity + (Vector3)externalVelocity) * deltaTime);
 
             Data.Velocity = (transform.position - previousPos) * Runner.TickRate;
             Data.Grounded = _controller.isGrounded;
@@ -135,14 +137,16 @@ namespace BucketBrawl
             var previousPos = transform.position;
             var moveVelocity = Data.Velocity;
 
-            delta = delta.normalized;
-
             if (Data.Grounded && moveVelocity.y < 0)
             {
                 moveVelocity.y = 0f;
             }
 
+            moveVelocity.y += gravity * Runner.DeltaTime;
+
             var horizontalVel = default(Vector3);
+            horizontalVel.x = moveVelocity.x;
+            horizontalVel.z = moveVelocity.z;
 
             horizontalVel += delta * deltaTime;
 

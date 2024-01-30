@@ -54,6 +54,23 @@ public class ItemBase : NetworkBehaviour
         Inactive
     }
 
+    [Serializable]
+    public struct FlightParams
+    {
+        public float Speed;
+        public float FlyHeight;
+        public float FlyTime;
+        public bool IsActive;
+
+        public FlightParams(float speed, float flyHeight, float flyTime, bool isActive)
+        {
+            Speed = speed;
+            FlyHeight = flyHeight;
+            FlyTime = flyTime;
+            IsActive = isActive;
+        }
+    }
+
 
 
     // Network methods
@@ -225,11 +242,11 @@ public class ItemBase : NetworkBehaviour
 
     // Local methods
 
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         DrawGizmos();
     }
-
 
     public virtual void DrawGizmos()
     {
@@ -248,22 +265,5 @@ public class ItemBase : NetworkBehaviour
 
         if (EditorApplication.isPlaying && Object != null && Object.IsValid) Handles.Label(transform.position, ((State)CurrentState).ToString(), style);
     }
-
-
-    [Serializable]
-    public struct FlightParams
-    {
-        public float Speed;
-        public float FlyHeight;
-        public float FlyTime;
-        public bool IsActive;
-
-        public FlightParams(float speed, float flyHeight, float flyTime, bool isActive)
-        {
-            Speed = speed;
-            FlyHeight = flyHeight;
-            FlyTime = flyTime;
-            IsActive = isActive;
-        }
-    }
+#endif
 }

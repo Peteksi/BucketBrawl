@@ -61,6 +61,7 @@ public class Bucket : ItemBase
 
     // Local methods
 
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         base.DrawGizmos();
@@ -69,4 +70,5 @@ public class Bucket : ItemBase
         Gizmos.DrawWireSphere(transform.position, hurtboxRadius);
         Gizmos.color = Color.white;
     }
+#endif
 }
