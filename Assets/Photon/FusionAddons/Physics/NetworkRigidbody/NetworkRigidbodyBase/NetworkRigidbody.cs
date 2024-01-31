@@ -2,21 +2,38 @@ using UnityEngine;
 
 namespace Fusion.Addons.Physics {
   using Physics = UnityEngine.Physics;
-
+  
+  /// <summary>
+  /// NetworkRigidbody base class with generic definition for the Unity Rigidbody type (3d or 2d) and
+  /// <see cref="RunnerSimulatePhysicsBase{TPhysicsScene}"/> type.
+  /// </summary>
   public abstract partial class NetworkRigidbody<RBType, PhysicsSimType> : NetworkRigidbodyBase, IStateAuthorityChanged, ISimulationExit
     where RBType          : Component
     where PhysicsSimType  : RunnerSimulatePhysicsBase {
     
     /// <summary>
-    /// Rigidbody component
+    /// Abstracted getter for cached Rigidbody component reference.
     /// </summary>
     public RBType Rigidbody => _rigidbody;
     
     // Cached
+    
+    /// <summary>
+    /// Cached Rigidbody reference.
+    /// </summary>
     protected RBType         _rigidbody;
+    /// <summary>
+    /// Cached reference of associated <see cref="RunnerSimulatePhysics3D"/> or <see cref="RunnerSimulatePhysics2D"/>.
+    /// </summary>
     protected PhysicsSimType _physicsSimulator;
+    /// <summary>
+    /// Stored original kinematic setting of the Rigidbody.
+    /// </summary>
     protected bool           _originalIsKinematic;
     
+    /// <summary>
+    /// Implementation of Unity Awake() method.
+    /// </summary>
     protected virtual void Awake() {
       TryGetComponent(out _transform);
       TryGetComponent(out _rigidbody);
@@ -31,6 +48,7 @@ namespace Fusion.Addons.Physics {
       SetRBIsKinematic(_rigidbody, true);
     }
 
+    /// <inheritdoc/>
     public override void Spawned() {
       base.Spawned();
 
@@ -57,7 +75,7 @@ namespace Fusion.Addons.Physics {
       }
     }
 
-
+    /// <inheritdoc/>
     public override void Despawned(NetworkRunner runner, bool hasState) {
       base.Despawned(runner, hasState);
       ResetRigidbody();
@@ -71,20 +89,33 @@ namespace Fusion.Addons.Physics {
       SetRBIsKinematic(_rigidbody, _originalIsKinematic);
     }
 
-     public virtual void StateAuthorityChanged() {
+    /// <summary>
+    /// Implementation of <see cref="IStateAuthorityChanged"/> callback.
+    /// </summary>
+    public virtual void StateAuthorityChanged() {
+
+      // This test exists because this callback currently fires on Scene Objects even if they are disabled.
+      // May not be needed in the future if this behaviour in Fusion is changed.
+      if (_rigidbody == false) {
+        return;
+      }
+
       // Debug.Log($"Auth Change {Runner.LocalPlayer} {name} {HasStateAuthority} {HasInputAuthority}");
-    
+
       if (Object.IsProxy) {
         SetRBIsKinematic(_rigidbody, true);
       } else {
-        // This assumes that the initial kinematic state (the state of the prefab or scene object)
-        // of the RB is what is intended. Users may want to override this with their own handling
-        // if they manually set the Rigidbody to kinematic via code during or after Spawned().
-        SetRBIsKinematic(_rigidbody, _originalIsKinematic);
+        // Apply complete state on the new Authority, to ensure velocities and extras apply to the now non-kinematic object.
+        CopyToEngine(true);
       }
     }
     
-    private void EnsureHasRunnerSimulatePhysics() {
+    /// <summary>
+    /// Tests if the NetworkRunner has the applicable
+    /// <see cref="RunnerSimulatePhysics3D"/> or <see cref="RunnerSimulatePhysics2D"/> component.
+    /// If not, adds one and applies a best guess for default settings.
+    /// </summary>
+    protected virtual void EnsureHasRunnerSimulatePhysics() {
       if (_physicsSimulator) {
         return;
       }

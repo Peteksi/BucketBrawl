@@ -14,12 +14,11 @@
     "HideNetworkObjectInactivityGuard": false,
     "Simulation": {
         "InputDataWordCount": 0,
-        "SceneInfoWordCount": 16,
-        "ReplicationFeatures": 0,
+        "ReplicationFeatures": 1,
         "InputTransferMode": 0,
-        "PlayerCount": 10,
+        "PlayerCount": 4,
         "TickRateSelection": {
-            "Client": 64,
+            "Client": 60,
             "ServerIndex": 0,
             "ClientSendIndex": 1,
             "ServerSendIndex": 1
@@ -33,6 +32,9 @@
     "HostMigration": {
         "EnableAutoUpdate": false,
         "UpdateDelay": 10
+    },
+    "EncryptionConfig": {
+        "EnableEncryption": false
     },
     "NetworkConditions": {
         "Enabled": false,

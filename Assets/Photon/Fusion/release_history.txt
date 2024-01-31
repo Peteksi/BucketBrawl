@@ -107,7 +107,78 @@ For a more in-depth overview over what changed check: [Coming from Fusion 1.0](h
 - Fixed: All folders ending with `Resources` incorrectly recognized as `Resources` folders, making some of the contained prefabs unspawnable
 - Fixed: "unresolved external symbol" runtime errors if an abstract class deriving from `NetworkBehaviour` has no `[Networked]` properties
 
+## RC3
+
+### Build 805 (Jan 17, 2024)
+
+**What's New**
+
+- Encryption Support
+- Mobile support for the introduction sample
+- `int IElementReaderWriter.GetElementHashCode(T element);`
+- Added OnChangedRender attribute to receive a callback before Render when a networked property changes
+
+**Changes**
+
+- Made `Runner.RemoveSimulationBehaviour` internal. Use `Runner.RemoveGlobal` instead
+- Added shared mode support to intro sample
+- `[NetworkSerialize]` methods no longer need to have a `NetworkRunner` parameter if a `[NetworkDeserialize]` method has one
+- Lag compensation capsule settings now matches unity capsule
+- Scheduling is now the default replication feature
+
+**Bug Fixes**
+
+- Fixed: NetAddress.CreateFromIpPort should ignore IPv6 Scope ID
+- Fixed: MC change not replicating MasterClient objects correctly
+- Fixed: MasterClient objects not being active on priority list on the new mc
+- Fixed: Avoid attach already valid Scene Network Objects
+- Fixed: Free object from priority list in shared mode clients
+- Fixed: Handle Disconnect while waiting for Join confirmation
+- Fixed: `FusionGlobalScriptableObject.GetMethodsWithAttribute` not handling `ReflectionTypeLoadException` errors
+- Fixed: Confirm Join Timeout
+- Fixed: Newly simulated objects blinking positions when reparenting
+- Fixed: Invalid `GetElementHashCode` generation for NBs
+- Fixed: `NetworkDictionary` key lookup not being deterministic for `System.String`, `NetworkObject` and `NetworkBehaviour` keys
+- Fixed: "SerializedObject target has been destroyed" error when clicking "Rebuild Prefab Table" in the config editor (Unity 2022.3.11+)
+
 ## RC
+
+### Build 801 (Dec 12, 2023)
+
+**Changes**
+
+- `NetworkRigidbody` XML Docs
+- `NetworkProjectConfigImporter` refreshes now whenever a new `NetworkObject` prefab is created, a prefab is moved or deleted
+- NetworkRigidbody EnsurerHasRunnerSimulatePhysics() changed from private to protected
+- _deferredTeleport field in NetworkRigidbody changed from private to protected
+
+**Removed**
+
+- Obsolete API
+
+**Bug Fixes**
+
+- Fixed: NetworkCharacterController Spawn at 0,0,0
+- Fixed: Issue with full consistency not acting properly when ReplicateTo was being used
+- Fixed: NetworkObjects not being replicated on clients correctly when scheduling only enabled
+- Fixed: Revert & Apply buttons always disabled in `NetworkProjectConfig` inspector
+- Fixed: Odin: inspector errors for `[Networked]` properties when using `[FoldoutGroups]`  
+Dev: Imported PhotonUnityEditorCommon@f81d7ff1bfa4ef962bd64e664a3c50a44e922404
+- Fixed: FusionStats NetworkObject stats would always fail to find stat data, now will correctly retry until found
+- Fixed: NetworkRigidbody fixed so State Authority changes in Shared Mode retain Rigidbody velocity on the new State Authority
+- Fixed: Timming issue with master client objects state authority changed detection
+- Fixed: NetworkRigidbody now un-dirties the interpolation target when SetInterpolationTarget(null) is called. This prevents null errors due to setting the target to null at runtime
+- Fixed: Test Suit Platforms
+- Fixed: `NullReferenceException` thrown by `NetworkProjectConfigImporterEditor` if initial prefab table import fails
+- Fixed: NetworkRigidbody3D ResetRigidbody() now checks for isKinematic before reseting velocity
+- Fixed: Change detector having incorrect ticks set
+- Fixed: "InvalidOperationException" during connection establishing on server
+- Fixed: Allocations in Timelines.Update
+- Fixed: Allocations in Client.GetInput
+- Fixed: Invalid properties when NetworkRunner is Uninitialized
+- Fixed: NRB handling of unparented Kinematic RBs now always applies pos/rot to Transform rather than Rigidbody
+- Fixed: Fusion.Addon.Physics assembly correctly renamed in NetworkProjectConfig.AssembliesToWeave defaults
+- Fixed: Editor freezing on prefab rename workaround applied to Unity 2022.3 as well
 
 ### Build 797 (Nov 07, 2023)
 
