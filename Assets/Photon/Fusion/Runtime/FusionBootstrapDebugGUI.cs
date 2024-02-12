@@ -97,7 +97,7 @@ namespace Fusion {
       }
 
       if (EnableHotkeys) {
-        if (Input.GetKeyDown(KeyCode.I)) {
+        if (Input.GetKeyDown(KeyCode.S)) {
           _networkDebugStart.StartSinglePlayer();
         }
 
@@ -109,7 +109,7 @@ namespace Fusion {
           }
         }
 
-        if (Input.GetKeyDown(KeyCode.S)) {
+        if (Input.GetKeyDown(KeyCode.E)) {
           if (_isMultiplePeerMode) {
             StartServerWithClients(_networkDebugStart);
           } else {
@@ -191,7 +191,7 @@ namespace Fusion {
             }
             GUILayout.EndHorizontal();
 
-            if (GUILayout.Button(EnableHotkeys ? "Start Single Player (I)" : "Start Single Player", GUILayout.Height(height))) {
+            if (GUILayout.Button(EnableHotkeys ? "Start Single Player (S)" : "Start Single Player", GUILayout.Height(height))) {
               nds.StartSinglePlayer();
             }
 
@@ -203,7 +203,7 @@ namespace Fusion {
               }
             }
 
-            if (GUILayout.Button(EnableHotkeys ? "Start Server (S)" : "Start Server", GUILayout.Height(height))) {
+            if (GUILayout.Button(EnableHotkeys ? "Start Server (E)" : "Start Server", GUILayout.Height(height))) {
               if (_isMultiplePeerMode) {
                 StartServerWithClients(nds);
 
