@@ -8677,6 +8677,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1438856974}
   - component: {fileID: 1438856975}
+  - component: {fileID: 1438856976}
   m_Layer: 0
   m_Name: Debug Console
   m_TagString: Untagged
@@ -8711,6 +8712,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32fde0edf077e3649b25c92dc64fc502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bootstrap: {fileID: 240439062}
+--- !u!114 &1438856976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438856973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00ef52980b1da34886602374c597bd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debugConsole: {fileID: 1438856975}
 --- !u!1 &1449194343
 GameObject:
   m_ObjectHideFlags: 0
@@ -12301,5 +12316,5 @@ SceneRoots:
   - {fileID: 1971303768}
   - {fileID: 240439063}
   - {fileID: 559224665}
-  - {fileID: 371764890}
   - {fileID: 1438856974}
+  - {fileID: 371764890}

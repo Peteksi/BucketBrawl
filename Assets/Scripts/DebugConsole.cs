@@ -1,36 +1,35 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Fusion;
 
 public class DebugConsole : MonoBehaviour
 {
+    public FusionBootstrap bootstrap;
+
     private string commandInput = "";
     private Vector2 consoleScrollPosition = Vector2.zero;
     private List<string> consoleLog = new List<string>();
     private GUIStyle consoleTextStyle;
+    private bool focusTextField = true;
 
-    private void OnEnable()
-    {
-        Application.logMessageReceived += HandleLog;
-    }
+    //private void OnEnable()
+    //{
+    //    Application.logMessageReceived += HandleLog;
+    //}
 
-    private void OnDisable()
-    {
-        Application.logMessageReceived -= HandleLog;
-    }
+    //private void OnDisable()
+    //{
+    //    Application.logMessageReceived -= HandleLog;
+    //}
 
     private void Start()
     {
-        consoleTextStyle = new GUIStyle(GUI.skin.textArea);
-        consoleTextStyle.wordWrap = true;
+        enabled = false;
     }
 
-    private void Update()
+    private void OnEnable()
     {
-        // Toggle the console with a key press (you can customize this)
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            ToggleConsole();
-        }
+        focusTextField = true;
     }
 
     private void OnGUI()
@@ -38,12 +37,18 @@ public class DebugConsole : MonoBehaviour
         if (!enabled)
             return;
 
+        if (consoleTextStyle == null)
+        {
+            consoleTextStyle = new GUIStyle(GUI.skin.textArea);
+            consoleTextStyle.wordWrap = true;
+        }
+
         DrawConsoleWindow();
     }
 
     private void DrawConsoleWindow()
     {
-        GUILayout.BeginArea(new Rect(10, Screen.height - 200, Screen.width - 20, 190), "Debug Console", "Window");
+        GUILayout.BeginArea(new Rect(10, Screen.height - 200, Screen.width - 20, 190), "Debug", "Window");
 
         // Display the console log
         consoleScrollPosition = GUILayout.BeginScrollView(consoleScrollPosition, GUILayout.ExpandHeight(true));
@@ -52,7 +57,15 @@ public class DebugConsole : MonoBehaviour
 
         // Input field for adding commands
         GUILayout.BeginHorizontal();
+
+        GUI.SetNextControlName("CommandLine");
         commandInput = GUILayout.TextField(commandInput, GUILayout.ExpandWidth(true));
+
+        if (focusTextField)
+        {
+            GUI.FocusControl("CommandLine");
+            focusTextField = false;
+        }
 
         // Process command input when Enter is pressed
         if (Event.current.isKey && Event.current.keyCode == KeyCode.Return && commandInput != "")
@@ -66,13 +79,7 @@ public class DebugConsole : MonoBehaviour
         GUILayout.EndArea();
     }
 
-    private void ToggleConsole()
-    {
-        // Toggle the visibility of the console
-        enabled = !enabled;
-    }
-
-    private void HandleLog(string logString, string stackTrace, LogType type)
+    private void HandleLog(string logString, string stackTrace, UnityEngine.LogType type)
     {
         // Handle Unity log messages and add them to the console log
         string logEntry = $"{type.ToString()}: {logString}";
@@ -88,8 +95,16 @@ public class DebugConsole : MonoBehaviour
 
     private void ExecuteCommand(string command)
     {
-        // Add your command execution logic here
-        // For now, we'll just add the command to the console log
-        consoleLog.Add($"Command: {command}");
+        switch (command)
+        {
+            case "shutdown":
+            case "shut":
+                bootstrap.ShutdownAll();
+                break;
+        }
+
+        consoleLog.Add($">{command}");
+
+        enabled = false;
     }
 }
