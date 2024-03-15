@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 using Fusion;
 
 public class DebugConsole : MonoBehaviour
@@ -95,15 +96,43 @@ public class DebugConsole : MonoBehaviour
 
     private void ExecuteCommand(string command)
     {
-        switch (command)
+        consoleLog.Add($">{command}");
+
+        string[] commandArray = command.Split(' ');
+
+        string commandBase = commandArray[0];
+
+        string var1 = commandArray.Length > 1 ? commandArray[1] : null;
+
+        switch (commandBase)
         {
             case "shutdown":
             case "shut":
                 bootstrap.ShutdownAll();
                 break;
-        }
 
-        consoleLog.Add($">{command}");
+            case "auto":
+            case "a":
+                if (var1 == null || var1 == "1")
+                {
+                    bootstrap.StartAutoClient();
+                }
+                else { bootstrap.StartMultipleAutoClients(Convert.ToInt32(var1)); }
+
+                break;
+
+            case "host":
+            case "h":
+                bootstrap.StartHost();
+                break;
+
+            case "client":
+            case "c":
+            case "join":
+            case "j":
+                bootstrap.StartClient();
+                break;
+        }
 
         enabled = false;
     }
