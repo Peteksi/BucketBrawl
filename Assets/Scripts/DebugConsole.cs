@@ -132,6 +132,11 @@ public class DebugConsole : MonoBehaviour
             case "j":
                 bootstrap.StartClient();
                 break;
+
+            case "single":
+            case "s":
+                bootstrap.StartSinglePlayer();
+                break;
         }
 
         enabled = false;

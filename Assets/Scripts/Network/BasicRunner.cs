@@ -34,23 +34,23 @@ public class BasicRunner : MonoBehaviour, INetworkRunnerCallbacks
     }
 
 
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef client)
     {
         if (runner.IsServer)
         {
-            var networkClientObject = runner.Spawn(_clientPrefab, Vector3.zero, Quaternion.identity, player);
+            var networkClientObject = runner.Spawn(_clientPrefab, Vector3.zero, Quaternion.identity, client);
 
-            _spawnedClients.Add(player, networkClientObject);
+            _spawnedClients.Add(client, networkClientObject);
         }
     }
 
 
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef client)
     {
-        if (_spawnedClients.TryGetValue(player, out NetworkObject networkPlayerObject))
+        if (_spawnedClients.TryGetValue(client, out NetworkObject networkPlayerObject))
         {
             runner.Despawn(networkPlayerObject);
-            _spawnedClients.Remove(player);
+            _spawnedClients.Remove(client);
         }
     }
 
